@@ -65,7 +65,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2020-06-01",
       "name": "pid-1af03e76-4403-4298-a570-2d65516a794b",
       // Personal "name": "pid-de35f354-30dd-4e75-a7cf-d92cd5c06603",
 
@@ -81,7 +81,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2019-06-01",
       "name": "[variables('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -92,7 +92,7 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -128,7 +128,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -136,9 +136,7 @@
       ],
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [
-            "[variables('addressPrefix')]"
-          ]
+          "addressPrefixes": ["[variables('addressPrefix')]"]
         },
         "subnets": [
           {
@@ -155,7 +153,7 @@
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('nicName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -183,12 +181,12 @@
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "name": "[concat(variables('vmName'), 'ManagedIdentity')]",
       "apiVersion": "2018-11-30",
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     },
 
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "identity": {
@@ -241,7 +239,7 @@
       }
     },
     {
-      "apiVersion": "2019-04-01-preview",
+      "apiVersion": "2020-04-01-preview",
       "name": "[guid(resourceGroup().id)]",
       "type": "Microsoft.Authorization/roleAssignments",
       "dependsOn": [
@@ -250,7 +248,9 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "principalId": "[reference(variables('vmName'),'2019-07-01', 'Full').identity.principalId]",
-        "scope": "[resourceGroup().id]"
+        "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Compute/virtualMachines/', variables('vmName'))]",
+        "scope": "[resourceGroup().id]",
+        "principalType": "ServicePrincipal"
       }
     }
   ],

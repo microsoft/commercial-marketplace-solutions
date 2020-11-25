@@ -37,6 +37,13 @@
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+    "uniqueIdForRole": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": {
+        "description": "Not to be used as a parameter, but as a hack to create guid."
+      }
     }
   },
   "variables": {
@@ -52,6 +59,7 @@
     "networkSecurityGroupName": "default-NSG",
     "managedApplicationId": "[resourceGroup().managedBy]",
     "managedApplicationName": "[last(split(variables('managedApplicationId'), '/'))]",
+    "applicationResourceGroupName": "[split(variables('managedApplicationId'), '/')[4]]",
     "roleId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
   },
   "resources": [
@@ -253,7 +261,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-09-01",
       "name": "roleAssignmentNestedTemplate",
-      "resourceGroup": "[resourceGroup().name]",
+      "resourceGroup": "[variables('applicationResourceGroupName')]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -263,7 +271,7 @@
             {
               "type": "Microsoft.Solutions/applications/providers/roleAssignments",
               "apiVersion": "2019-04-01-preview",
-              "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', 'access')]",
+              "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', parameters('uniqueIdForRole'))]",
               "properties": {
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]",
                 "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",

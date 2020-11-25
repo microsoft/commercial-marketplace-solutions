@@ -64,7 +64,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2020-06-01",
       "name": "pid-1af03e76-4403-4298-a570-2d65516a794b",
       // Personal "name": "pid-de35f354-30dd-4e75-a7cf-d92cd5c06603",
 
@@ -80,7 +80,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2019-06-01",
       "name": "[variables('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -91,7 +91,7 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -127,7 +127,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -152,7 +152,7 @@
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('nicName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -180,12 +180,12 @@
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "name": "[concat(variables('vmName'), 'ManagedIdentity')]",
       "apiVersion": "2018-11-30",
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     },
 
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "identity": {
@@ -243,7 +243,7 @@
       }
     },
     {
-      "apiVersion": "2019-04-01-preview",
+      "apiVersion": "2020-04-01-preview",
       "name": "[guid(resourceGroup().id)]",
       "type": "Microsoft.Authorization/roleAssignments",
       "dependsOn": [
@@ -251,7 +251,7 @@
       ],
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]",
-        "principalId": "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
         "scope": "[resourceGroup().id]",
         "principalType": "ServicePrincipal",
         "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]"
@@ -259,7 +259,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-09-01",
       "name": "roleAssignmentNestedTemplate",
       "resourceGroup": "[variables('applicationResourceGroupName')]",
       "properties": {
@@ -273,8 +273,8 @@
               "apiVersion": "2019-04-01-preview",
               "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', parameters('uniqueIdForRole'))]",
               "properties": {
-                "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('roleId'))]",
-                "principalId": "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
                 "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]",
                 "scope": "[variables('managedApplicationId')]",
                 "principalType": "ServicePrincipal"
@@ -284,7 +284,46 @@
         }
       },
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-09-01",
+      "name": "outputsForDeployent",
+      "resourceGroup": "[resourceGroup().name]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [],
+          "outputs": {
+            "hostname": {
+              "type": "string",
+              "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
+            },
+            "managedAppId": {
+              "type": "string",
+              "value": "[variables('managedApplicationId')]"
+            },
+            "roleDefinitionId": {
+              "type": "string",
+              "value": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]"
+            },
+            "principalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]"
+            },
+            "delegatedManagedIdentityResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ]
     }
   ],
@@ -292,6 +331,10 @@
     "hostname": {
       "type": "string",
       "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
+    },
+    "managedAppId": {
+      "type": "string",
+      "value": "[variables('managedApplicationId')]"
     }
   }
 }

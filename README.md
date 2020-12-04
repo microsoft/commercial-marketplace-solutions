@@ -20,6 +20,10 @@ Here is what we will cover in this article.
         - [Getting the value for resourceUri or resourceId](#getting-the-value-for-resourceuri-or-resourceid)
       - [Using an Azure Web App](#using-an-azure-web-app)
     - [Option 2 - calling the metering API from a central service](#option-2---calling-the-metering-api-from-a-central-service)
+  - [Accompanying templates](#accompanying-templates)
+    - [VM running as user assigned managed identity](#vm-running-as-user-assigned-managed-identity)
+    - [VM running as system assigned managed identity](#vm-running-as-system-assigned-managed-identity)
+    - [VM running as user assigned managed identity having access to managed app](#vm-running-as-user-assigned-managed-identity-having-access-to-managed-app)
 
 ## Managed applications overview
 
@@ -307,5 +311,46 @@ This should return the  **billingDetails** property with **resourceUsageId**.
 
 Now you need to get an access token for your AAD app registration for calling the metering APIs, you have resourceId (resourceUsageId value from above), and the count of the meter you want to post.
 
+## Accompanying templates
+
+There are three different templates with slightly varying structures to support the examples above. They demonstrate how the different approaches above can be used.
+   - system-assigned: Used for all approaches except getting resourceUsageId from the billingDetails of the managed application
+   - user-assigned: Used for all approaches except getting resourceUsageId from the billingDetails of the managed application
+   - user-assigned-nested: Demonstrates how permissions can be set for getting resourceUsageId from the billingDetails of the managed application
+
+All of the templates have the following resources. 
+
+Internal deployment that sets the partner and customer usage attribution with a name starting with "pid-". The templates set either a user assigned managed identity or a system assigned managed identity to the VM.
 
 
+1. Storage account as a diagnostics store for the VM
+2. Public IP address for the VM
+3. A network security group 
+4. Virtual network
+5. Network interface card
+6. Virtual machine - approaches for identity are different in the samples
+7. Role assignment - varies by approach
+   
+### VM running as user assigned managed identity
+The template defines a user assigned managed identity resource (of type 'Microsoft.ManagedIdentity/userAssignedIdentities').
+
+The VM runs under this managed identity. This identity assumes the reader role for the managed resource group and specifies the cross tenant access though '**delegatedManagedIdentityResourceId**' property.
+
+We are setting the **delegatedManagedIdentityResourceId** to access the managed application's ID through the managed resource group's '**managedBy**'. That property needs a resource Id, and user assigned managed identity is a resource, so getting the resource ID is easy. Also notice how the principalId for this resource is set, we are accessing the user defined managed identity resource, and getting the principalId.
+
+### VM running as system assigned managed identity
+
+The VM runs under a system assigned managed identity. This identity assumes the reader role for the managed resource group and specifies the cross tenant access though '**delegatedManagedIdentityResourceId**' property. Notice how the principalId is set. This time the principalId is on the VM resource. Also, the value for the delegatedManagedIdentityResourceId property is slightly different, we are accessing the VM's resource ID.
+
+We are setting the **delegatedManagedIdentityResourceId** to access the managed application's ID through the managed resource group's '**managedBy**'. That property needs a resource Id, and user assigned managed identity is a resource, so getting the resource ID is easy.
+
+
+### VM running as user assigned managed identity having access to managed app
+
+The template defines a user assigned managed identity resource (of type 'Microsoft.ManagedIdentity/userAssignedIdentities').
+
+The VM runs under this managed identity. This identity assumes the reader role for the managed resource group and specifies the cross tenant access though '**delegatedManagedIdentityResourceId**' property.
+
+The template then defines a nested template to be run after this deployment complete. Important note is to use 'incremental' mode on this template. The template defines a role assignment resource that assigns the reader role for the user assigned managed identity to the managed application created in the main template. Please notice the 'scope' property for the role assignment.
+
+The additional nested template named 'outputsForDeployent' is used for debugging.

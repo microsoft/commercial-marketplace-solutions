@@ -101,7 +101,7 @@ Now let's see how you can get the access token. You can get a token with one of 
 Let's move on to see how you can use the managed identity to request an access token. We need to access the metadata URL for the VM to get this token as follows.
 
 ``` PowerShell
-    $metadataTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
+    $managementTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
     $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $managementTokenUrl 
 ```
 
@@ -115,29 +115,31 @@ Next up is how to get the **resourceUri** value. In order to get that, we need t
 
 1.  On the VM, grab a token for management API from the metadata endpoint. Notice the resource we are requesting the token for, this time it is https://management.azure.com, the Azure management API
 ``` PowerShell
-    $metadataTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F"
+    $managementTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F"
     $Token = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $managementTokenUrl 
  ```
 
 2.	Call the metadata endpoint to grab the subscription ID and resource group name
 ``` PowerShell
-    $Headers = @{}
-    $Headers.Add("Authorization","$($Token.token_type) "+ " " + "$($Token.access_token)")
     $metadataUrl = "http://169.254.169.254/metadata/instance?api-version=2019-06-01"
     $metadata = Invoke-RestMethod -Headers @{'Metadata'='true'} -Uri $metadataUrl 
 ```
 
 3.	We will use the values for subscription ID and resource group name to call management API to get the managed app details. This will give you something like /subscriptions/bf7adf12-c3a8-426c-9976-29f145eba70f/resourceGroups/ercmngd/providers/Microsoft.Solutions/applications/userassigned1112
 ``` PowerShell
+    $Headers = @{}
+    $Headers.Add("Authorization","$($Token.token_type) "+ " " + "$($Token.access_token)")
+
     $managementUrl = "https://management.azure.com/subscriptions/" + $metadata.compute.subscriptionId + "/resourceGroups/" + $metadata.compute.resourceGroupName + "?api-version=2019-10-01"
     $resourceGroupInfo = Invoke-RestMethod -Headers $Headers -Uri $managementUrl 
     $managedappId = $resourceGroupInfo.managedBy 
 ```
 
-4. Now let's use the code at the top to get the token for calling marketplace APIs
+
+1. Now let's use the code at the top to get the token for calling marketplace APIs
 ``` PowerShell
-    $metadataTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
-    $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $managementTokenUrl 
+    $marketplaceTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
+    $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $marketplaceTokenUrl
 ```
 
 5. At this point we have the token to call the metering API with, plus all of the details. But first we need to adjust some details for the service client, since marketplace API implements TLS 1.2.
@@ -146,7 +148,7 @@ Next up is how to get the **resourceUri** value. In order to get that, we need t
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12;
 ```
 
-5. Now TLS 1.2 is out of the way, and we have the token, let's build the payload. Notice the trick I am using to make sure I am reporting for this hour only with a 5 minute delay.
+5. Now TLS 1.2 is out of the way, and we have the token, let's build the payload. Notice the trick I am using to make sure I am reporting for this hour only with a 5 minute delay. Notice we are hard coding the plan id here, since we do not have permissions for accessing the properties on the managed app. We can get that if we use the nested deployment method below.
 
 ``` PowerShell
     $lastHourMinusFiveMinutes = (Get-Date).AddMinutes(-65).ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -163,7 +165,7 @@ Next up is how to get the **resourceUri** value. In order to get that, we need t
     $response = Invoke-RestMethod 'https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31' -Method 'POST' -ContentType "application/json" -Headers $Headers -Body $body -Verbose
 ```
 
-What if we want to use resourceId instead of resourceUri? For that case, your managed identity needs to have at least Read permissions on the Managed Application resource itself. You can achieve this by using an incremental deployment in an ARM template. Let's see how it works. Following snippet demonstrates how you can a nested deployment in an ARM template with an embedded template marked with incremental deployment mode.
+What if we want to use resourceId instead of resourceUri and also get the plan ID of the offer the managed application? For that case, your managed identity needs to have at least Read permissions on the Managed Application resource itself. You can achieve this by using an incremental deployment in an ARM template. Let's see how it works. Following snippet demonstrates how you can a nested deployment in an ARM template with an embedded template marked with incremental deployment mode.
 
 
 ``` json
@@ -233,6 +235,8 @@ $managedAppUrl = "https://management.azure.com" + $managedappId + "\?api-version
 $managedApp = Invoke-RestMethod -Headers $Headers -Uri $managedAppUrl  
 
 $resourceUsageId = $ManagedApp.properties.billingDetails.resourceUsageId
+
+$planId = $managedApp.plan.name
 ```
 
 #### Using an Azure Web App

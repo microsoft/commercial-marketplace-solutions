@@ -324,9 +324,8 @@ There are three different templates with slightly varying structures to support 
    - user-assigned: Used for all approaches except getting resourceUsageId from the billingDetails of the managed application
    - user-assigned-nested: Demonstrates how permissions can be set for getting resourceUsageId from the billingDetails of the managed application
 
-All of the templates have the following resources. 
 
-Internal deployment that sets the partner and customer usage attribution with a name starting with "pid-". The templates set either a user assigned managed identity or a system assigned managed identity to the VM.
+The templates set either a user assigned managed identity or a system assigned managed identity to the VM.
 
 
 1. Storage account as a diagnostics store for the VM

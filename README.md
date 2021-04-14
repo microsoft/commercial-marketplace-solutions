@@ -86,7 +86,7 @@ Let's see how you can get those and post a custom meter request. You will need t
 
 
 You will need to implement following in your ARM template
-1.  Have a [user assigned managed identity](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L171), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L252).
+1.  Have a [user assigned managed identity](./src/user-assigned/mainTemplate.json#L156), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L252).
 2.  [Assign it to the VM ](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L182), if you are using system assigned managed identity, see [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L195).
 3.  Give [Reader access to the resource group](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L245) 
 4.  Set [**delegatedManagedIdentityResourceId** property](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L248) to make the connection with the managed app 

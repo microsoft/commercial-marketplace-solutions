@@ -86,10 +86,10 @@ Let's see how you can get those and post a custom meter request. You will need t
 
 
 You will need to implement following in your ARM template
-1.  Have a [user assigned managed identity](./src/user-assigned/mainTemplate.json#L156), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L252).
-2.  [Assign it to the VM ](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L182), if you are using system assigned managed identity, see [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L195).
-3.  Give [Reader access to the resource group](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L245) 
-4.  Set [**delegatedManagedIdentityResourceId** property](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L248) to make the connection with the managed app 
+1.  Have a [user assigned managed identity](./src/user-assigned/mainTemplate.json#L156), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](./src/system-assigned/mainTemplate.json#L193).
+2.  [Assign it to the VM](./src/user-assigned/mainTemplate.json#L168), if you are using system assigned managed identity, see [here](./src/system-assigned/mainTemplate.json#L193).
+3.  Give [Reader access to the resource group](./src/user-assigned/mainTemplate.json#L225) 
+4.  Set [**delegatedManagedIdentityResourceId** property](./src/user-assigned/mainTemplate.json#L233) to make the connection with the managed app 
 
 ##### Getting an access token 
 Now let's see how you can get the access token. You can get a token with one of the two methods.
@@ -105,7 +105,7 @@ Let's move on to see how you can use the managed identity to request an access t
     $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $managementTokenUrl 
 ```
 
-Notice we are requesting this token for the marketplace API resource with the id **20e940b3-4c77-4b0b-9a53-9e16a1b010a7** see [this document for details ](https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#request-body:~:text=Target%20resource%20for%20which%20the%20token,the%20target%20resource%20in%20this%20case.)
+Notice we are requesting this token for the marketplace API resource with the id **20e940b3-4c77-4b0b-9a53-9e16a1b010a7** see [this document for details](https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#request-body:~:text=Target%20resource%20for%20which%20the%20token,the%20target%20resource%20in%20this%20case.)
 And the reason this token will work is because of step (4) above for the ARM template.
 
 ##### Getting the value for resourceUri or resourceId

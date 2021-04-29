@@ -49,7 +49,8 @@
     "vmName": "SimpleWinVM",
     "virtualNetworkName": "MyVNET",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-    "networkSecurityGroupName": "default-NSG"
+    "networkSecurityGroupName": "default-NSG",
+    "managedIdentityName": "[concat(variables('vmName'), 'ManagedIdentity')]"
   },
   "resources": [
     {
@@ -154,7 +155,7 @@
     },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "name": "[concat(variables('vmName'), 'ManagedIdentity')]",
+      "name": "[variables('managedIdentityName')]",
       "apiVersion": "2018-11-30",
       "location": "[parameters('location')]"
     },
@@ -230,7 +231,7 @@
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
         "scope": "[resourceGroup().id]",
-        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]"  }
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))]"  }
     }
   ],
   "outputs": {

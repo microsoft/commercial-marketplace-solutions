@@ -65,21 +65,6 @@
   },
   "resources": [
     {
-      "apiVersion": "2020-06-01",
-      "name": "pid-1af03e76-4403-4298-a570-2d65516a794b",
-      // Personal "name": "pid-de35f354-30dd-4e75-a7cf-d92cd5c06603",
-
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": []
-        }
-      }
-    },
-    {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2019-06-01",
       "name": "[variables('storageAccountName')]",
@@ -248,7 +233,7 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "principalId": "[reference(variables('vmName'),'2019-07-01', 'Full').identity.principalId]",
-        "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Compute/virtualMachines/', variables('vmName'))]",
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]", 
         "scope": "[resourceGroup().id]",
         "principalType": "ServicePrincipal"
       }

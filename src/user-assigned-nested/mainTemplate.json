@@ -60,7 +60,8 @@
     "managedApplicationId": "[resourceGroup().managedBy]",
     "managedApplicationName": "[last(split(variables('managedApplicationId'), '/'))]",
     "applicationResourceGroupName": "[split(variables('managedApplicationId'), '/')[4]]",
-    "roleId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+    "roleId": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+    "managedIdentityName": "[concat(variables('vmName'), 'ManagedIdentity')]"
   },
   "resources": [
     {
@@ -163,7 +164,7 @@
     },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "name": "[concat(variables('vmName'), 'ManagedIdentity')]",
+      "name": "[variables('managedIdentityName')]",
       "apiVersion": "2018-11-30",
       "location": "[parameters('location')]"
     },
@@ -176,14 +177,14 @@
       "identity": {
         "type": "userAssigned",
         "userAssignedIdentities": {
-          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/', concat(variables('vmName'), 'ManagedIdentity'))]": {}
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('managedIdentityName'))]": {}
         }
       },
 
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', concat(variables('vmName'), 'ManagedIdentity'))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('managedIdentityName'))]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -236,10 +237,10 @@
       ],
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('managedIdentityName'))).principalId]",
         "scope": "[resourceGroup().id]",
         "principalType": "ServicePrincipal",
-        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]"
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))]"
       }
     },
     {
@@ -259,8 +260,8 @@
               "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', parameters('uniqueIdForRole'))]",
               "properties": {
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId'))]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]",
-                "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('managedIdentityName'))).principalId]",
+                "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))]",
                 "scope": "[variables('managedApplicationId')]",
                 "principalType": "ServicePrincipal"
               }
@@ -298,11 +299,11 @@
             },
             "principalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',concat(variables('vmName'), 'ManagedIdentity'))).principalId]"
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))).principalId]"
             },
             "delegatedManagedIdentityResourceId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(variables('vmName'), 'ManagedIdentity'))]"
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))]"
             }
           }
         }

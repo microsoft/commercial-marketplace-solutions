@@ -19,20 +19,20 @@ Here is what we will cover in this article.
     - [Acquire an access token to call metering API](#acquire-an-access-token-to-call-metering-api)
     - [What is this meter request for?](#what-is-this-meter-request-for)
     - [Usage information](#usage-information)
-  - [Option 1, calling the API directly from a code piece deployed on the managed resource group](#option-1-calling-the-api-directly-from-a-code-piece-deployed-on-the-managed-resource-group)
-    - [A principal ID on the metering service ACL](#a-principal-id-on-the-metering-service-acl-1)
-    - [Acquire an access token to call metering API](#acquire-an-access-token-to-call-metering-api-1)
-    - [What is this meter request for?](#what-is-this-meter-request-for-1)
-    - [Usage information](#usage-information-1)
-  - [Option 2 - calling the metering API from a central service](#option-2---calling-the-metering-api-from-a-central-service)
-    - [A principal ID on the metering service ACL](#a-principal-id-on-the-metering-service-acl-2)
-    - [Acquire an access token to call metering API](#acquire-an-access-token-to-call-metering-api-2)
-    - [What is this meter request for?](#what-is-this-meter-request-for-2)
-    - [Usage information](#usage-information-2)
-  - [Accompanying templates](#accompanying-templates)
-    - [VM running as user assigned managed identity](#vm-running-as-user-assigned-managed-identity)
-    - [VM running as system assigned managed identity](#vm-running-as-system-assigned-managed-identity)
-    - [VM running as user assigned managed identity having access to managed app](#vm-running-as-user-assigned-managed-identity-having-access-to-managed-app)
+- [Option 1, calling the API directly from a code piece deployed on the managed resource group](#option-1-calling-the-api-directly-from-a-code-piece-deployed-on-the-managed-resource-group)
+  - [A principal ID on the metering service ACL](#a-principal-id-on-the-metering-service-acl-1)
+  - [Acquire an access token to call metering API](#acquire-an-access-token-to-call-metering-api-1)
+  - [What is this meter request for?](#what-is-this-meter-request-for-1)
+  - [Usage information](#usage-information-1)
+- [Option 2, calling the metering API from a central service](#option-2-calling-the-metering-api-from-a-central-service)
+  - [A principal ID on the metering service ACL](#a-principal-id-on-the-metering-service-acl-2)
+  - [Acquire an access token to call metering API](#acquire-an-access-token-to-call-metering-api-2)
+  - [What is this meter request for?](#what-is-this-meter-request-for-2)
+  - [Usage information](#usage-information-2)
+- [Accompanying templates](#accompanying-templates)
+  - [VM running as user assigned managed identity](#vm-running-as-user-assigned-managed-identity)
+  - [VM running as system assigned managed identity](#vm-running-as-system-assigned-managed-identity)
+  - [VM running as user assigned managed identity having access to managed app](#vm-running-as-user-assigned-managed-identity-having-access-to-managed-app)
 
 ## Managed applications overview
 
@@ -140,22 +140,33 @@ You can get the resource URI from the managedBy property on the managed resource
 
 This is the same for both of the options. Since you are already tracking the usage of a particular feature, as represented with a meter dimension on the plan, you need to post this either to the metering API, or the central service, that is, the meter dimension id and the value (amount).
 
-## Option 1, calling the API directly from a code piece deployed on the managed resource group
+<br/>
+
+# Option 1, calling the API directly from a code piece deployed on the managed resource group
+
+We have mentioned two different options, when using custom meters for managed applications. 
+
+1. Post directly by the deployed resources on the customer deployments.
+2. Send usage data to your central service you maintain, and post from there.
+
+![Custom meter options](./media/custommeteroptions.png)
+
 
 Now lets go through the point above for this option. For this, We are going to assume we have a VM in the template, and we are accessing the VM and using PowerShell to call the snippets for demonstrating the concepts. You can translate the same to your programming language of choice.
 
-We have mentioned that you need to have a managed identity on the template before. You can have either a user assigned managed identity, or system assigned managed identity. 
+We have mentioned that you need to have a managed identity on the template before. You can have either a user assigned managed identity, or system assigned managed identity.
 
-### A principal ID on the metering service ACL
+## A principal ID on the metering service ACL
 
-1.  Have a [user assigned managed identity](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L171), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L252).
-2.  [Assign it to the VM ](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L182), if you are using system assigned managed identity, see [here](https://github.com/Azure-Samples/commercial-marketplace-managed-application-metering-samples/blob/main/src/system-assigned/mainTemplate.json#L195).
-3.  Give [Reader access to the resource group](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L245) 
-4.  Set [**delegatedManagedIdentityResourceId** property](https://github.com/Ercenk/ManagedAppCustomMeters/blob/master/src/appArtifacts/user-assigned/mainTemplate.json#L248) to make the connection with the managed app.
+1.  Have a [user assigned managed identity](./src/user-assigned-nested/mainTemplate.json#157), or a system assigned managed identity. If you chose to use system assigned managed identity, please see the sample [here](./src/system-assigned/mainTemplate.json#171).
+2.  [Assign it to the VM ](./src/user-assigned-nested/mainTemplate.json#171), if you are using system assigned managed identity, see [here](./src/system-assigned/mainTemplate.json#171).
+3.  Give [Reader access to the resource group](./src/user-assigned-nested/mainTemplate.json#224)
+4.  Set [**delegatedManagedIdentityResourceId** property](./src/user-assigned-nested/mainTemplate.json#234) to make the connection with the managed app.
 
-### Acquire an access token to call metering API
+## Acquire an access token to call metering API
 
 Next step is to acquire an access token. You can get a token with one of the two methods.
+
 1. Use the managed identity provisioned in the template. We will demonstrate this approach below.
 
 2. Use the AAD App registration details on the "Technical details" tab of the offer on Partner Center. You need to pass in the client secret in a safe way to be able to request a token for this app. Please see the [sample](https://github.com/arsenvlad/azure-managed-app-publisher-secret) demonstrating how you can extend a secret from a Key Vault managed by the publisher to another Key Vault deployed as a part of the managed application.
@@ -163,16 +174,16 @@ Next step is to acquire an access token. You can get a token with one of the two
 Let's move on to see how you can use the managed identity to request an access token. We need to access the metadata URL for the VM to get this token as follows.
 
 ``` PowerShell
-    $managementTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
-    $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $managementTokenUrl 
+    $marketplaceTokenUrl = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
+    $marketplaceToken = Invoke-RestMethod -Headers @{"Metadata" = "true"} -Uri $marketplaceTokenUrl 
 ```
 
 Notice we are requesting this token for the marketplace API resource with the id **20e940b3-4c77-4b0b-9a53-9e16a1b010a7** see [this document for details ](https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#request-body:~:text=Target%20resource%20for%20which%20the%20token,the%20target%20resource%20in%20this%20case.)
 And the reason this token will work is because of step (4) above for the ARM template.
 
-### What is this meter request for?
+## What is this meter request for?
 
-Let's first get the **resourceUri** value. In order to get that, we need to take multiple steps. And the reason we can do this is because we have assigned read access for this managed identity on the managed resource group with the snippet below. It goes without saying that you need to be very careful when you are using managed identites, and RBAC, so you do not expose secrets, and comprimise your security.My example below is not a security best practice, but how you can obtain certain values. Assess your risks carefully, and take appropriate action.
+Let's first get the **resourceUri** value. In order to get that, we need to take multiple steps. And the reason we can do this is because we have assigned read access for this managed identity on the managed resource group with the snippet below. It goes without saying that you need to be very careful when you are using managed identites, and RBAC, so you do not expose secrets, and compromise your security. My example below is not a security best practice, but an example on how you can obtain certain values. Assess your risks carefully, and take appropriate action.
 
 ```JSON
     {
@@ -217,7 +228,11 @@ We will take advantage of the [Azure Instance Metadata Service](https://docs.mic
     $managedappId = $resourceGroupInfo.managedBy 
 ```
 
-What if we want to use resourceId instead of resourceUri and also get the plan ID of the offer the managed application? For that case, your managed identity needs to have at least Read permissions on the Managed Application resource itself. You can achieve this by using an incremental deployment in an ARM template. Let's see how it works. Following snippet demonstrates how you can a nested deployment in an ARM template with an embedded template marked with incremental deployment mode.
+The full source code for using the resourceUri is [here](./src/postingTheMeterUsingResourceUri.ps1).
+
+What if we want to use resourceId instead of resourceUri and also get the plan ID of the offer the managed application? For that case, your managed identity needs to have at least Read permissions on the Managed Application resource itself. You can achieve this by using an incremental deployment in an ARM template. You can find a sample in the ["user-assigned-nested"](./src/user-assigned-nested/mainTemplate.json) directory.
+
+Let's see how it works. Following snippet demonstrates how you can a nested deployment in an ARM template with an embedded template marked with incremental deployment mode.
 
 
 ``` json
@@ -289,7 +304,9 @@ $planId = $managedApp.plan.name
 
 Please see this [sample](./src/user-assigned-nested/mainTemplate.json) for using a nested deployment to assign the appropriate access to the managed application itself to read the resourceUsageId property.
 
-### Usage information
+The full source of the PowerShell script is [here](./src/postingTheMeterUsingResourceId.ps1).
+
+## Usage information
 
 We will now build the payload. Notice the trick I am using to make sure I am reporting for this hour only with a 5 minute delay. Notice we are hard coding the plan id here, since we do not have permissions for accessing the properties on the managed app. We can get that if we use the nested deployment method below.
 
@@ -321,7 +338,8 @@ We will now build the payload. Notice the trick I am using to make sure I am rep
     $response = Invoke-RestMethod 'https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31' -Method 'POST' -ContentType "application/json" -Headers $Headers -Body $body -Verbose
 ```
 
-## Option 2 - calling the metering API from a central service
+
+# Option 2, calling the metering API from a central service
 
 Let's revisit the items you need for posting a meter once more.
 
@@ -334,7 +352,7 @@ And go through them for Option 2, calling an intermediate service publisher expo
 
 ![Option2](./media/option2.png)
 
-### A principal ID on the metering service ACL
+## A principal ID on the metering service ACL
 
 We will be using a central service to call the metering API. In order to do that, we will use a [Microsoft Indentity Service app registration](https://docs.microsoft.com/en-us/graph/auth-register-app-v2) (a.k.a. Azure Active Directory app registration).
 
@@ -342,20 +360,20 @@ You will need to then add the tenant ID & client ID of the registration on the t
 
 ![Technical configuration](./media/technicalconfiguration.png)
 
-### Acquire an access token to call metering API
+## Acquire an access token to call metering API
 
 Use the AAD App registration details on the "Technical details" tab of the offer on Partner Center. You need to pass in the client secret in a safe way to be able to request a token for this app. Please see the [sample](https://github.com/arsenvlad/azure-managed-app-publisher-secret) demonstrating how you can extend a secret from a Key Vault managed by the publisher to another Key Vault deployed as a part of the managed application.
 
 Alternatively, you can use one of the client libraries [here](https://github.com/microsoft/commercial-marketplace-samples#clients-for-fulfillment-and-metering-apis).
 
-### What is this meter request for?
+## What is this meter request for?
 
 You can take one of the two methods for getting this.
 
 1. Get all of the information from the deployment directly. This is the same method as Option 1. You need to have a managed identity, that can access the managed resource group properties, or the **billingProperties** property of the managed application.
 2. Configure an AAD App registration and add it to the Authorizations list of the plan, with at least contributor level access. Get partial information from the deployment, with the Azure subscription Id, and the resource group. Use the configured AAD App to call Azure management API to get the "managedBy" property on the managed resource group and use resourceURI parameter to post the meter.
   
-First method is coverd in Option 1 discussion. Let's look at how the second method works.
+First method is covered in Option 1 discussion. Let's look at how the second method works.
 
 I am assuming you already have a published (or in preview) managed app that has at least one VM in it, with RBAC configured so the managed identity it is running under has access to the managed resource group. [Please see this as an example](https://github.com/Ercenk/marketplacemanagedappwithmeters/blob/master/artifacts/user-assigned/mainTemplate.json#L250). 
 
@@ -417,11 +435,11 @@ Now copy the value of the return access_token, and insert into the following cUr
 
 This should return the  **billingDetails** property with **resourceUsageId**.
 
-### Usage information
+## Usage information
 
 This information is posted by the deployment to your service's endpoint. We are not getting into the implementation details for this service or how to secure that since it is out of scope for this discussion. Assuming that the service receives this information, along with who this usage is for, next is to call the metering API either directly, or using one of the [clients](https://github.com/microsoft/commercial-marketplace-samples#clients-for-fulfillment-and-metering-apis) to post the usage.
 
-## Accompanying templates
+# Accompanying templates
 
 There are three different templates with slightly varying structures to support the examples above. They demonstrate how the different approaches above can be used.
    - system-assigned: Used for all approaches except getting resourceUsageId from the billingDetails of the managed application
@@ -440,21 +458,21 @@ The templates set either a user assigned managed identity or a system assigned m
 6. Virtual machine - approaches for identity are different in the samples
 7. Role assignment - varies by approach
    
-### VM running as user assigned managed identity
+## VM running as user assigned managed identity
 The template defines a user assigned managed identity resource (of type 'Microsoft.ManagedIdentity/userAssignedIdentities').
 
 The VM runs under this managed identity. This identity assumes the reader role for the managed resource group and specifies the cross tenant access though '**delegatedManagedIdentityResourceId**' property.
 
 We are setting the **delegatedManagedIdentityResourceId** to access the managed application's ID through the managed resource group's '**managedBy**'. That property needs a resource Id, and user assigned managed identity is a resource, so getting the resource ID is easy. Also notice how the principalId for this resource is set, we are accessing the user defined managed identity resource, and getting the principalId.
 
-### VM running as system assigned managed identity
+## VM running as system assigned managed identity
 
 The VM runs under a system assigned managed identity. This identity assumes the reader role for the managed resource group and specifies the cross tenant access though '**delegatedManagedIdentityResourceId**' property. Notice how the principalId is set. This time the principalId is on the VM resource. Also, the value for the delegatedManagedIdentityResourceId property is slightly different, we are accessing the VM's resource ID.
 
 We are setting the **delegatedManagedIdentityResourceId** to access the managed application's ID through the managed resource group's '**managedBy**'. That property needs a resource Id, and user assigned managed identity is a resource, so getting the resource ID is easy.
 
 
-### VM running as user assigned managed identity having access to managed app
+## VM running as user assigned managed identity having access to managed app
 
 The template defines a user assigned managed identity resource (of type 'Microsoft.ManagedIdentity/userAssignedIdentities').
 

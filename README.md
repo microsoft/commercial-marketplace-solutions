@@ -1,15 +1,16 @@
-# Posting custom meters for a Commercial Marketplace managed app offer
+# Mastering the Marketplace - Enabling metered billing in Marketplace Managed Application Offers
 
-I have been working with a few teams to help them use managed app offers with custom meters. I would like to consolidate my notes here for the general public's consumption. Usual disclaimer apply, this is sample only, use it at your own risk, understand the concepts throughly before implementing your own. 
+This repository provides examples of how to enable billing via custom meters for Azure Managed Application offers. We highly reccommend you review the Mastering the Marketplace library's [Azure Managed Application course](https://github.com/microsoft/Mastering-the-Marketplace/blob/main/ama/README.md) before using this repository.
 
-What you need to know
+## Requirements
+
 - Deploying resources to Azure subscriptions
 - Azure Active Directory (AAD) concepts, such as users, groups, application registrations, service principals, authenticating with AAD, and auhorizing access to resources
 - Role based access control (RBAC) on Azure
 - Managed applications
 - Calling marketplace APIs
 
-Here is what we will cover in this article.
+## Overview
 
 - [Posting custom meters for a Commercial Marketplace managed app offer](#posting-custom-meters-for-a-commercial-marketplace-managed-app-offer)
   - [Managed applications overview](#managed-applications-overview)

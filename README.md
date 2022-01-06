@@ -1,4 +1,4 @@
-# Mastering the Marketplace - Enabling metered billing in Marketplace Managed Application Offers
+# Mastering the Marketplace - Enabling metered billing in Managed Application Offers
 
 This repository provides examples of how to enable billing via custom meters for Azure Managed Application offers. We highly reccommend you review the Mastering the Marketplace library's [Azure Managed Application course](https://github.com/microsoft/Mastering-the-Marketplace/blob/main/ama/README.md) before using this repository.
 

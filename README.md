@@ -8,6 +8,6 @@ This project shows how to post metered billing events from an Azure Managed Appl
 
 <br>
 
-# Post a Metered Billing Event Using  Notification webhook
+# Post a Metered Billing Event Using Notification webhook
 
-1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook/README.md) using a C#.
+1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook/README.md) using sC#.

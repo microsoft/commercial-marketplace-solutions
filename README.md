@@ -14,10 +14,11 @@ Post a metered billing event from a VM deployed inside a managed resource group.
 ## Azure Functions
 
 Post a metered billing event from an Azure function. 
+1. Post a metered billing event [from a Azure Function HTTP Trigger](./function/ama-custom-billing-msi-trigger/README.md) using a C#.
+1. Post Recurring metered billing event [from a Azure Function Timer](./function/ama-custom-billing-msi-timer/README.md) using a C#.
 
-1. [Azure Function HTTP Trigger Example using C#](./function/ama-custom-billing-msi-trigger/README.md)
-1. Recurring metered billing from a Azure Function Timer](./function/ama-custom-billing-msi-timer/README.md)
+<br>
 
-## Post a metered billing event using notification webhook
+# Post a Metered Billing Event Using  Notification webhook
 
-1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook/README.md) using C#.
+1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook/README.md) using a C#.

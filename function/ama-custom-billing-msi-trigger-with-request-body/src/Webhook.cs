@@ -25,34 +25,16 @@ namespace ManagedWebhook
             ILogger log,
             ExecutionContext context)
         {
-
-            DateTime effectiveStartTime = DateTime.UtcNow;
-
+            
             var config = new ConfigurationBuilder()
              .SetBasePath(context.FunctionAppDirectory)
              .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
              .AddEnvironmentVariables()
              .Build();
 
-
-            // this is mandatory
-            string quantity = req.Query["quantity"];
-            string dimension = req.Query["dimension"];
-
-            // this is optional
-            string dt = req.Query["effectiveStartTime"];
-
-            if(quantity == null)
-                return new BadRequestObjectResult("Please pass a quantity on the query string or in the request header");
-
-
-            if(dimension == null)
-                return new BadRequestObjectResult("Please pass a dimension on the query string or in the request header");
-
-            if(dt != null)
-                effectiveStartTime=DateTime.Parse(dt);
-
-
+            //read Request body
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var usageRequest = JsonConvert.DeserializeObject<UsageEventDefinitionDto>(requestBody);
 
             using (var armHttpClient = HttpClientFactory.Create())
             {
@@ -64,25 +46,36 @@ namespace ManagedWebhook
 
                 if (application != null)
                 {
-                    //log.LogInformation($"Authorization bearer token: {armToken}");
-                    log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
-                    log.LogInformation($"Plan name: {application.Plan.Name}");
-                    log.LogInformation($"Dimension: {dimension}");
-                    log.LogInformation($"Quantity: {quantity}");
+                        
+                        if((usageRequest.Quantity == null)||(usageRequest.Quantity<=0))
+                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
 
-                    var response = await Webhook.EmitUsageEvents(config, armHttpClient, dimension,quantity,effectiveStartTime, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
-                    var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
-                    if (response.IsSuccessStatusCode)
-                    {
-                            log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
-                            return new OkObjectResult($"Successfully emitted a usage event. Reponse body: {responseBody}");
-                    }
-                    else
-                    {
-                            log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
-                            return new BadRequestObjectResult($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
-                    }
-                    
+
+                        if(usageRequest.Dimension.IsNullOrEmpty)
+                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
+
+                        usageRequest.EffectiveStartTime=DateTime.UtcNow;
+
+                        //log.LogInformation($"Authorization bearer token: {armToken}");
+                        log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
+                        log.LogInformation($"Plan name: {application.Plan.Name}");
+                        log.LogInformation($"Dimension: {usageRequest.Dimension}");
+                        log.LogInformation($"Quantity: {usageRequest.Quantity}");
+
+
+                        var response = await Webhook.EmitUsageEvents(config, armHttpClient, usageRequest.Dimension,usageRequest.Quantity,usageRequest.EffectiveStartTime, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
+                        var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
+                        if (response.IsSuccessStatusCode)
+                        {
+                                log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
+                                return new OkObjectResult($"Successfully emitted a usage event. Reponse body: {responseBody}");
+                        }
+                        else
+                        {
+                                log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
+                                return new BadRequestObjectResult($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
+                        }
+
                 }
                 else
                         return new BadRequestObjectResult($"Failed to retreive application information");

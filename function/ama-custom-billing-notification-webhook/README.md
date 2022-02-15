@@ -1,19 +1,10 @@
 # Deploy Metered Listenner App for Azure Marketplace Managed-App:
 
-This demo shows how to deploy azure function to monitor managed app notification and emit meter usage events to marketplace using predefined dimensions and quantities based on config.
+This demo shows HOW-TO deploy azure function to listen to  managed app **Notification Endpoint URL** and emit meter usage events to marketplace using **predefined** dimensions and quantities based on config.
 
 ## Design
 The following diagrm shows the overall workflow for this demo
 ![Diagram](./images/Diagram.png)
-
-
-## Custom billing Senarios
-
-The source code show two different senario for custom billing.
-
-1. One Time Fee custom billing that happening once the managed resources are created. Please refer to [custom-billing folder](./custom-billing)
-
-1. Recurring custom Free billing that happening once the managed resources are created. Please refer to [recurring-custom-billing folder](./recurring-custom-billing)
 
 
 ## Important Configuration
@@ -26,8 +17,22 @@ ARM template expects the following configuration
 
 1. <b>DIMENSION_CONFIG</b> predefined dimensions and quantities that the function will use to emit usage event to Azure marketplace
 
+## Installation
+Use ARM template under `arm` folder to deploy the meter monitoring system.
+### Option #1
+User could use Azure Portal to deploy the arm template using [Custom Deployment](https://portal.azure.com/#create/Microsoft.Template)
 
-## Managed App Technical Configuration
+### Option #2
+User could deploy the solution using Powershell commands 
+```
+git clone https://github.com/microsoft/commercial-marketplace-managed-application-metering-samples.git
+cd commercial-marketplace-managed-application-metering-samples/function/ama-custom-billing-notification-webhook/arm
+
+New-AzResourceGroupDeployment -ResourceGroupName <resource-group-name> -TemplateFile ./azuredeploy.json
+
+```
+
+## Installation from Partner Center
 
 Use the Arm Template output result to configure managed app as following
 
@@ -46,3 +51,19 @@ Under plan technical configuration :
 
 ![diagram](./images/Diagram3.png)
 
+
+## Testing and Usage
+1. Deploy the managed app as customer
+2. From publisher tenant open the solution resource group, open CosmosDB
+![diagram](./images/Diagram4.png)
+3. Open **Data Explorer** and check container records. There should be a record for the newly created mananged app.
+![diagram](./images/Diagram5.png)
+4. From publisher tenant open the solution resource group, open ApplicationInsight
+5. From Logs, Run ther following query 
+```
+traces 
+| where operation_Name contains "job" and message contains "emit"
+```
+![diagram](./images/Diagram6.png)
+
+6. Confirm there are successful emitting events

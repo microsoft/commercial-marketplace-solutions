@@ -1,6 +1,6 @@
 # Deploy  Azure Marketplace Managed-App with built-in Custom billing Meter:
 
-This demo shows how to deploy Managed App with Function app to  emit meter usage events to marketplace using predefined dimensions and quantities based on config.
+This demo shows how to deploy Managed App with Function app to  emit meter usage events to marketplace using **predefined dimensions and quantities** in code.
 
 ## Design
 The following diagrm shows the overall workflow for this demo
@@ -9,7 +9,7 @@ The following diagrm shows the overall workflow for this demo
 
 ## Custom billing Senario
 
-This demo shows how to implement a recurring custom fee billing that happening once the managed resources are created using Azure function timer crobjob.
+This demo shows how to implement a **recurring fix fee billing** that happening once the managed resources are created using Azure function timer crobjob.
 
 
 ## Important Configuration
@@ -29,3 +29,25 @@ In order to pass the Partner center validation you need to update the resource n
 
 1. ARM Template will deploy function using `WEBSITE_RUN_FROM_PACKAGE` and expecting `functionpackage.zip` to place under `artifacts` folder.
 ![diagram](./images/Diagram4.png)
+
+
+## Installation from Partner Center Preview
+
+1. Use the contents of the `/function/ama-custom-billing-msi-timer/arm` folder to create a ZIP file for your plan in Partner Center.
+1. Upload the ZIP file to the Technical Configuration page of the Azure Managed Application plan in Partner Center.
+1. Publish the plan. It will take some time for the plan to reach Preview stage.
+1. From Preview, purchase the plan. 
+    - Do not purchase the plan from the same Azure Tenant as the one used to publish the plan. If you do so, the script referenced later will error.
+    
+
+## Usage from the Managed Application
+
+1. After deployment is complete, open **managed resouce group** 
+1. Open ApplicationInsight and  run the following query 
+```
+traces 
+| where operation_Name contains "job" and message contains "emit"
+```
+![diagram](./images/Diagram6.png)
+
+1. Confirm there are successful emitting events

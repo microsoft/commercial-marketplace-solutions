@@ -51,7 +51,7 @@ namespace ManagedWebhook
                             return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
 
 
-                        if(usageRequest.Dimension.IsNullOrEmpty)
+                        if(String.IsNullOrEmpty(usageRequest.Dimension))
                             return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
 
                         usageRequest.EffectiveStartTime=DateTime.UtcNow;
@@ -151,12 +151,12 @@ namespace ManagedWebhook
         /// <summary>
         /// Emits the usage event to the configured MARKETPLACEAPI_URI.
         /// </summary>
-        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,string quantity,DateTime  effectiveStartTime,string resourceUsageId, string planId)
+        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,double quantity,DateTime  effectiveStartTime,string resourceUsageId, string planId)
         {
             var usageEvent = new UsageEventDefinition
             {
                 ResourceId = resourceUsageId,
-                Quantity = double.Parse(quantity),
+                Quantity = quantity,
                 Dimension = dimension,
                 EffectiveStartTime = effectiveStartTime,
                 PlanId = planId

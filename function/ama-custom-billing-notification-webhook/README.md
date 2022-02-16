@@ -56,7 +56,7 @@ Under plan technical configuration :
 ![diagram](./images/Diagram4.png)
 3. Open **Data Explorer** and check container records. There should be a record for the newly created mananged app.
 ![diagram](./images/Diagram5.png)
-4. From publisher tenant open the solution resource group, open ApplicationInsight
+4. From publisher tenant open the solution resource group, open the created Application Insights resource
 5. From Logs, Run ther following query 
 ```
 traces 
@@ -65,3 +65,4 @@ traces
 ![diagram](./images/Diagram6.png)
 
 6. Confirm there are successful emitting events
+

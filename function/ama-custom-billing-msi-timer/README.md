@@ -39,9 +39,11 @@ In order to pass the Partner center validation you need to update the resource n
     
 
 ## Usage from the Managed Application
-
-1. After deployment is complete, open **managed resouce group** 
-1. Open ApplicationInsight and  run the following query 
+1. This demo is using **hourly timer** so event will emitted on top of each hour
+1. After deployment is complete, open **managed resource group** 
+1. Open the created Application Insights resource
+![diagram](./images/Diagram7.png)
+1. From logs, Run the following query. Make sure to wait till the top of the hour to see the emitting events 
 ```
 traces 
 | where operation_Name contains "job" and message contains "emit"

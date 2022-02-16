@@ -15,7 +15,7 @@ namespace ManagedWebhook
     {
         [FunctionName("CronJob")]
         public static async Task Run(
-            [TimerTrigger("0 0/5 * * * *")]TimerInfo timerInfo,
+            [TimerTrigger("0 0 0/1 * * *")]TimerInfo timerInfo,
             ILogger log,
             ExecutionContext context)
         {

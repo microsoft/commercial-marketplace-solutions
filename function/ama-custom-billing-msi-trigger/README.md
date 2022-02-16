@@ -32,7 +32,7 @@ In order to pass the Partner center validation you need to update the resource n
 
 ## Usage from the Managed Application
 
-1. After deployment is complete, open **managed resouce group** 
+1. After deployment is complete, open **managed resource group** 
 1. Open function app and Click **Functions**
 1. Click Webhook  and Click **Code + Test ** to get Fuction URL
 ![diagram](./images/Diagram7.png)
@@ -40,7 +40,9 @@ In order to pass the Partner center validation you need to update the resource n
 ```
 curl  <webhook function url>?dimension=<dimension ID>&quantity=<quantity>
 ```
-1. Open ApplicationInsight and  run the following query 
+1. Open the created Application Insights resource
+![diagram](./images/Diagram8.png)
+1. From logs, Run the following query. 
 ```
 traces 
 | where operation_Name contains "Webhook" and message contains "emit"
@@ -48,4 +50,3 @@ traces
 ![diagram](./images/Diagram6.png)
 
 1. Confirm there are successful emitting events
-

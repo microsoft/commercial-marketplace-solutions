@@ -34,19 +34,15 @@ In order to pass the Partner center validation you need to update the resource n
 
 1. After deployment is complete, open **managed resource group** 
 1. Open function app and Click **Functions**
-1. Click Webhook  and Click **Code + Test ** to get Fuction URL
+1. Click Webhook  and Click **Code + Test** to then click **Test/Run**
 ![diagram](./images/Diagram7.png)
-1. Open Cloud Shell and run the curl command 
-```
-curl  <webhook function url>?dimension=<dimension ID>&quantity=<quantity>
-```
-1. Open the created Application Insights resource
+1. In the Testing Panel, Under **Query** Section, Click **Add parameter** and enter the following
+- Name = dimension
+- Value = key
+1.  Click **Add parameter** and enter the following
+- Name = quantity
+- Value = 1
 ![diagram](./images/Diagram8.png)
-1. From logs, Run the following query. 
-```
-traces 
-| where operation_Name contains "Webhook" and message contains "emit"
-```
-![diagram](./images/Diagram6.png)
+1. Click **Run** and you should see the following successful emitting event
+![diagram](./images/Diagram9.png)
 
-1. Confirm there are successful emitting events

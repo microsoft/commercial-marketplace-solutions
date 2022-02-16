@@ -185,7 +185,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "name": "pid-customer Guid ID-partnercenter",
+            "name": "<< Enter pid-customer Guid ID-partnercenter  >>",
             "resourceGroup": "[variables('applicationResourceGroupName')]",
             "properties": {
                 "mode": "Incremental",

@@ -11,9 +11,7 @@ The following diagrm shows the overall workflow for this demo
 ARM template expects the following configuration
 1. <b>tokenResource</b> This value should be set to `20e940b3-4c77-4b0b-9a53-9e16a1b010a7` [refer to the Marketplace Authentication doc](https://docs.microsoft.com/en-us/azure/marketplace/marketplace-metering-service-authentication)
 
-1. <b>_artifactsLocation</b> ARM template will deploy function from a Zip file so it is expected to pass the location of the zip file using this `_artifactsLocation` parameter
-
-1. <b>_artifactsLocationSasToken</b> It is optional and only required if accessing the function zip file require a token
+1. <b>Variable artifacts:</b> ARM template will deploy function from a Zip file. This variable is used to reference to the location of the zip file
 
 1. <b>DIMENSION_CONFIG</b> predefined dimensions and quantities that the function will use to emit usage event to Azure marketplace
 

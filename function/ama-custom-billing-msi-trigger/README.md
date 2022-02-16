@@ -43,7 +43,6 @@ In order to pass the Partner center validation you need to update the resource n
 1.  Click **Add parameter** and enter the following
 - Name = quantity
 - Value = 1
-1. The request will be as following
 ![diagram](./images/Diagram8.png)
 
 1. Click **Run** and you should see the following successful emitting event

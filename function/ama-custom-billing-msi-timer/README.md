@@ -3,7 +3,7 @@
 This demo shows how to deploy Managed App with Function app to  emit meter usage events to marketplace using **predefined dimensions and quantities** in code.
 
 ## Design
-The following diagrm shows the overall workflow for this demo
+The following diagram shows the overall workflow for this demo
 ![Diagram](./images/Diagram.png)
 
 

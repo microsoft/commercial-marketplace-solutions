@@ -3,7 +3,7 @@
 This demo shows HOW-TO deploy azure function to listen to  managed app **Notification Endpoint URL** and emit meter usage events to marketplace using **predefined** dimensions and quantities based on config.
 
 ## Design
-The following diagrm shows the overall workflow for this demo
+The following diagram shows the overall workflow for this demo
 ![Diagram](./images/Diagram.png)
 
 

@@ -36,13 +36,13 @@ In order to pass the Partner center validation you need to update the resource n
 1. Open function app and Click **Functions**
 1. Click Webhook  and Click **Code + Test** to then click **Test/Run**
 ![diagram](./images/Diagram7.png)
-1. In the Testing Panel, Under **Query** Section, Click **Add parameter** and enter the following
-- Name = dimension
-- Value = key
+1. In the Testing Panel, Under **Query** Section, Click **Add parameter** and enter the following 
+Name = dimension
+Value = key
 
 1.  Click **Add parameter** and enter the following
-- Name = quantity
-- Value = 1
+Name = quantity
+Value = 1
 ![diagram](./images/Diagram8.png)
 
 1. Click **Run** and you should see the following successful emitting event

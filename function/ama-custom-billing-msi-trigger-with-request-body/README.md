@@ -9,10 +9,14 @@ The following diagram shows the overall workflow for this demo
 
 ## Custom billing Senario
 
-This demo shows how to implement a custom billing using Azure  http trigger function where usage information will be passed on request body as following.
+This demo shows how to implement a custom billing using Azure http trigger function where usage information will be passed on request body.
+For this demo, we setup plan information as following
+![diagram](./images/Diagram5.png)
+
+The Azure function will expect body as following
 ```
 {
-    "dimension" : "test",
+    "dimension" : "key",
     "quantity"  : 1
 }
 ```

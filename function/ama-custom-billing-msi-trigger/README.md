@@ -7,6 +7,15 @@ The following diagram shows the overall workflow for this demo
 ![Diagram](./images/Diagram.png)
 
 
+
+
+## Custom billing Senario
+
+This demo shows how to implement a custom billing using Azure http trigger function where usage information will be passed on the request header query
+
+For this demo, we setup plan information as following
+![diagram](./images/Diagram5.png)
+
 ## Important Configuration
 ARM template expects the following configuration
 1. <b>Variable artifacts:</b> ARM template will deploy function from a Zip file. This variable is used to reference to the location of the zip file

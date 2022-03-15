@@ -183,30 +183,15 @@
             ]
         },
         {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2021-04-01",
-            "name": "Enter pid-customer Guid ID-partnercenter Here",
-            "resourceGroup": "[variables('applicationResourceGroupName')]",
+            "type": "Microsoft.Solutions/applications/providers/roleAssignments",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', parameters('applicationResourceRoleAssignment'))]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-                        {
-                            "type": "Microsoft.Solutions/applications/providers/roleAssignments",
-                            "apiVersion": "2021-04-01-preview",
-                            "name": "[concat(variables('managedApplicationName'), '/Microsoft.Authorization/', parameters('applicationResourceRoleAssignment'))]",
-                            "properties": {
                                 "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('msiAccessRoleId'))]",
                                 "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionName')), '2018-11-01', 'Full').identity.principalId]",
                                 "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionName'))]",
                                 "scope": "[variables('managedApplicationId')]",
                                 "principalType": "ServicePrincipal"
-                            }
-                        }
-                    ]
-                }
             },
             "dependsOn": [
                 "[concat('Microsoft.Web/sites/', parameters('functionName'))]"

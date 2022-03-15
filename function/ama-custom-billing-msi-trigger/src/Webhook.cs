@@ -43,11 +43,11 @@ namespace ManagedWebhook
             string dt = req.Query["effectiveStartTime"];
 
             if(quantity == null)
-                return new BadRequestObjectResult("Please pass a quantity on the query string or in the request body");
+                return new BadRequestObjectResult("Please pass a quantity on the query string or in the request header");
 
 
             if(dimension == null)
-                return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
+                return new BadRequestObjectResult("Please pass a dimension on the query string or in the request header");
 
             if(dt != null)
                 effectiveStartTime=DateTime.Parse(dt);

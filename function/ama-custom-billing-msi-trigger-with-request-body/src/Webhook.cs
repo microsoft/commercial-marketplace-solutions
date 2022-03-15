@@ -8,54 +8,77 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using System.Collections.Generic;
+using System.IO;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ManagedWebhook
 {
-    public static class CronJob
+    public static class Webhook
     {
-        [FunctionName("CronJob")]
-        public static async Task Run(
-            [TimerTrigger("0 0 0/1 * * *")]TimerInfo timerInfo,
+        [FunctionName("Webhook")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resource")] HttpRequest req,
             ILogger log,
             ExecutionContext context)
         {
+            
             var config = new ConfigurationBuilder()
              .SetBasePath(context.FunctionAppDirectory)
              .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
              .AddEnvironmentVariables()
              .Build();
 
-            var dimensionConfigs = JsonConvert.DeserializeObject<DimensionConfig[]>(config["DIMENSION_CONFIG"]);
-            log.LogTrace($"Dimension configs: {JsonConvert.SerializeObject(dimensionConfigs)}");
+            //read Request body
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var usageRequest = JsonConvert.DeserializeObject<UsageEventDefinitionDto>(requestBody);
 
             using (var armHttpClient = HttpClientFactory.Create())
             {
-                var armToken = await CronJob.GetToken(config, armHttpClient, log, "https://management.core.windows.net/").ConfigureAwait(continueOnCapturedContext: false);
+                var armToken = await Webhook.GetToken(config, armHttpClient, log, "https://management.core.windows.net/").ConfigureAwait(continueOnCapturedContext: false);
                 armHttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {armToken}");
 
-                var applicationResourceId = await CronJob.GetResourceGroupManagedBy(config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
-                var application = await CronJob.GetApplication(applicationResourceId, config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
+                var applicationResourceId = await Webhook.GetResourceGroupManagedBy(config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
+                var application = await Webhook.GetApplication(applicationResourceId, config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
 
                 if (application != null)
                 {
-                    log.LogInformation($"Authorization bearer token: {armToken}");
-                    log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
-                    log.LogInformation($"Plan name: {application.Plan.Name}");
+                        
+                        if((usageRequest.Quantity == null)||(usageRequest.Quantity<=0))
+                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
 
-                    foreach (var dimensionConfig in dimensionConfigs)
-                    {
-                        var response = await CronJob.EmitUsageEvents(config, armHttpClient, dimensionConfig, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
+
+                        if(String.IsNullOrEmpty(usageRequest.Dimension))
+                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
+
+                        usageRequest.EffectiveStartTime=DateTime.UtcNow;
+
+                        //log.LogInformation($"Authorization bearer token: {armToken}");
+                        log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
+                        log.LogInformation($"Plan name: {application.Plan.Name}");
+                        log.LogInformation($"Dimension: {usageRequest.Dimension}");
+                        log.LogInformation($"Quantity: {usageRequest.Quantity}");
+
+
+                        var response = await Webhook.EmitUsageEvents(config, armHttpClient, usageRequest.Dimension,usageRequest.Quantity,usageRequest.EffectiveStartTime, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
                         var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
                         if (response.IsSuccessStatusCode)
                         {
-                            log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
+                                log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
+                                return new OkObjectResult($"Successfully emitted a usage event. Reponse body: {responseBody}");
                         }
                         else
                         {
-                            log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
+                                log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
+                                return new BadRequestObjectResult($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
                         }
-                    }
+
                 }
+                else
+                        return new BadRequestObjectResult($"Failed to retreive application information");
             }
         }
 
@@ -64,7 +87,7 @@ namespace ManagedWebhook
         /// </summary>
         private static async Task<string> GetToken(IConfigurationRoot config, HttpClient httpClient, ILogger log, string resource)
         {
-            if (CronJob.IsLocalRun(config))
+            if (Webhook.IsLocalRun(config))
             {
                 return "token";
             }
@@ -128,18 +151,18 @@ namespace ManagedWebhook
         /// <summary>
         /// Emits the usage event to the configured MARKETPLACEAPI_URI.
         /// </summary>
-        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, DimensionConfig dimensionConfig, string resourceUsageId, string planId)
+        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,double quantity,DateTime  effectiveStartTime,string resourceUsageId, string planId)
         {
             var usageEvent = new UsageEventDefinition
             {
                 ResourceId = resourceUsageId,
-                Quantity = dimensionConfig.Quantity,
-                Dimension = dimensionConfig.Dimension,
-                EffectiveStartTime = DateTime.UtcNow,
+                Quantity = quantity,
+                Dimension = dimension,
+                EffectiveStartTime = effectiveStartTime,
                 PlanId = planId
             };
 
-            if (CronJob.IsLocalRun(config))
+            if (Webhook.IsLocalRun(config))
             {
                 return new HttpResponseMessage
                 {

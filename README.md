@@ -11,11 +11,12 @@ Post a metered billing event from an Azure function.
 1. Post a metered billing event [from a Azure Function HTTP Trigger using header request](./function/ama-custom-billing-msi-trigger) using a C#.
 1. Post a metered billing event [from a Azure Function HTTP Trigger using body request](./function/ama-custom-billing-msi-trigger-with-request-body) using a C#.
 1. Post Recurring metered billing event [from a Azure Function Timer](./function/ama-custom-billing-msi-timer) using a C#.
-<br>
+<br/>
+
 # Post a Metered Billing Event Using  Notification webhook
 1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook) using a C#.
 
-<br>
+<br/>
 
 ## Azure DevOps CI/CD 
 This is reference implementation on HOW-TO **Publishers** can [implement CI/CD process](./azure-devops-cicd/README.md) to update their managed application instance in customers environment. The implementation highlists HOW-TO

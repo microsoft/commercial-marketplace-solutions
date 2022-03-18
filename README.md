@@ -13,7 +13,7 @@ Post a metered billing event from an Azure function.
 1. Post Recurring metered billing event [from a Azure Function Timer](./function/ama-custom-billing-msi-timer) using a C#.
 <br/>
 
-# Post a Metered Billing Event Using  Notification webhook
+## Post a Metered Billing Event Using  Notification webhook
 1. Post a metered billing event on creation [from Managed Application Notification webhook](./function/ama-custom-billing-notification-webhook) using a C#.
 
 <br/>

@@ -1,24 +1,28 @@
-# Azure Managed App CI/CD Demo
-The goal of this demo is to demonstrate how to build azure pipeline to update azure managed application artifacts in customer environment.
+# Azure Managed App CI/CD solution
+The goal of this solution is to demonstrate how to build azure pipeline to update azure managed application artifacts in customer environment. This solution
+will deploy:
+1. Managed-application ARM delta to modify existing plan deploymen
+1. New code base for  WebApp resource
 
 # Requirements
-The demo requirement is to have the knowledge of 
+The solution requirement is to have the knowledge of 
 1. [Create and publish managed app](https://docs.microsoft.com/en-us/azure/marketplace/azure-app-offer-setup)
 1. [Azure pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/what-is-azure-pipelines?view=azure-devops)
 
-# Learning Resources
-It is highly recommended to review the following material before starting this demo
+# Resources to Review
+It is highly recommended to review the following material before starting this solution
 1. [Managed Applications for the Microsoft Marketplace - Workshop](https://aka.ms/AMAWorkshop)
 1. [Customize your pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/customize-pipeline?view=azure-devops)
 1. [Create Azure AD App Registration](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
+
 # Prerequisites
-Before using the demo, the following components should exist:
+Before using the solution, the following components should exist:
 1. Azure managed app offer with at least one plan
 1. AAD App Registration
 > [!NOTE]
 > AAD App Registration will be used as part of the managed app plan technical configuration and also as part of Azure pipeline 
 
-## Publish the managed app demo
+## Publish the managed app solution
 1. Find `amav1.zip` under `arm folder` and upload it to managed app plan technical configuration
 ![image](./images/image3.png)
 1. Use AAD App Registration  `Client ID` to relocate its corresponding `Enterprise App`

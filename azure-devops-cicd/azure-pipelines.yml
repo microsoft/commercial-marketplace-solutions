@@ -136,6 +136,11 @@ stages:
                           echo "=================================================================================="
                           echo " Push new artifact to webapp "
                           echo "=================================================================================="
+                          webAppName=$(cat armoutput.txt|grep 'Microsoft.Web/sites'| head -1)
+                          webAppName=$(awk -F ':' '{print $2}' <<< $webAppName)
+                          webAppName=$(echo $webAppName | cut -d '"' -f 2)
+                          webAppName=$(echo $webAppName| awk '{split($0,a,"/"); print a[9]}')
+                          echo $webAppName
                           az webapp config appsettings set --subscription $subscription  -g $managedResourceGroupId --name  $webAppName --setting WEBSITE_RUN_FROM_PACKAGE=1
                           az webapp deployment source config-zip --name  $webAppName --subscription $subscription  -g $managedResourceGroupId --src ../webpackage/src.zip
                         

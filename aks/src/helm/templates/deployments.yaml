@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appBackLabel }}
+
+spec:
+  replicas: {{ .Values.replicaBackCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appBackLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appBackLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.appBackLabel }}
+          image: "{{ .Values.backendImage }}"
+          ports:
+          - containerPort: 27017
+            name: {{ .Values.appBackLabel }}
+          env:
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: {{ .Values.mongoDBPassword }}
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: {{ .Values.mongoDBAdmin }}          
+          resources:
+            requests:
+              cpu: 100m
+              memory: 250Mi
+            limits:
+              cpu: 100m
+              memory: 250Mi
+      imagePullSecrets:
+        - name: regcred 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appFrontLabel }}
+spec:
+  replicas: {{ .Values.replicaFrontCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  selector:
+    matchLabels:
+      app: {{ .Values.appFrontLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appFrontLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.appFrontLabel }}
+          image: "{{ .Values.frontendImage }}" 
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 250Mi
+            limits:
+              cpu: 100m
+              memory: 250Mi
+          env:
+          - name: ENVIRONMENT
+            value: development
+          - name: DATABASE_NAME
+            value: azure-todo-app
+          - name: DATABASE_URL
+            value: mongodb://{{ .Values.mongoDBAdmin }}:{{ .Values.mongoDBPassword }}@{{ .Values.appBackLabel }}-svc.{{ .Values.nameSpace }}.svc.cluster.local:27017/
+          - name: PORT
+            value: "80"
+      imagePullSecrets:
+        - name: regcred           
+# Add if operator to env vars

@@ -1,0 +1,30 @@
+# Azure Vote UI control
+title: Azure ToDo App
+frontendImage: magdysalem.azurecr.io/nodejstodo:v3
+backendImage: magdysalem.azurecr.io/mongo:latest
+# MongoDB Admin
+mongoDBAdmin: mongoadmin
+mongoDBPassword: secret
+
+# Service controls
+serviceType: LoadBalancer
+appFrontLabel: todoapp
+appBackLabel: mongodb
+#ingressName
+clusterDNS: "Enter DNS Value"
+
+# how many frontends do we want?
+replicaFrontCount: 1
+replicaBackCount: 1
+
+## Where it will be deployed
+nameSpace: default
+
+
+
+
+
+
+
+
+

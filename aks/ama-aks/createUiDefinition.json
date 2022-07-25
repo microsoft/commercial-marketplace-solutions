@@ -1,0 +1,127 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "config": {
+      "basics": {
+        "subscription": {	
+          "constraints": {	
+            "validations": [	
+              {	
+                "permission": "Microsoft.Authorization/roleDefinitions/write",	
+                "message": "Azure user deploying this Managed Application must have permission to assign roles."	
+              }	
+            ]	
+          },	
+          "resourceProviders": [	
+            "Microsoft.Resources",	
+            "Microsoft.OperationalInsights",	
+            "Microsoft.OperationsManagement",	
+            "Microsoft.ContainerService",	
+            "Microsoft.Compute",	
+            "Microsoft.Network",	
+            "Microsoft.Storage"	
+          ]	
+        },	
+        "resourceGroup": {	
+          "allowExisting": true	
+        },
+        "location": {
+          "visible": true,
+          "resourceTypes": [
+            "Microsoft.ContainerService/managedClusters"
+          ]
+        }
+      }
+    },
+    "basics": [
+      {
+        "name": "aksName",
+        "type": "Microsoft.Common.TextBox",
+        "label": "AKS Cluster Name",
+        "defaultValue": "",
+        "toolTip": "Use only allowed characters",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z0-9_\\-]{3,63}$",
+          "validationMessage": "Only alphanumeric, underscores, hyphens, and must be 3-63 characters long."
+        },
+        "visible": true
+      },
+      {
+        "name": "nodeSize",
+        "type": "Microsoft.Compute.SizeSelector",
+        "label": "Size",
+        "toolTip": "The size of virtual machines to use for nodes in the cluster",
+        "recommendedSizes": [
+          "Standard_DS2_v2",
+          "Standard_D4s_v3"
+        ],
+        "options": {
+          "hideDiskTypeFilter": false
+        },
+        "osPlatform": "Linux",
+        "imageReference": {
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "16.04-LTS"
+        },
+        "count": 1,
+        "visible": true
+      },
+      {
+        "name": "nodeCount",
+        "type": "Microsoft.Common.Slider",
+        "min": 1,
+        "max": 10,
+        "label": "Node Count",
+        "subLabel": "Nodes",
+        "defaultValue": 1,
+        "showStepMarkers": true,
+        "toolTip": "The number of nodes to provision in the cluster",
+        "constraints": {
+          "required": true
+        },
+        "visible": true
+      }
+    ],
+    "steps": [
+      {
+        "name": "managedIdentitySettings",
+        "label": "Managed Identity Settings",
+        "subLabel": {
+          "preValidation": "Configure managed identity settings",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Managed Identity Settings",
+        "elements": [
+          {
+            "name": "appManagedIdentity",
+            "type": "Microsoft.ManagedIdentity.IdentitySelector",
+            "label": "Managed Identity Configuration",
+            "toolTip": {
+              "systemAssignedIdentity": "Enable system assigned identity to grant the managed application access to additional existing resources.",
+              "userAssignedIdentity": "Add user assigned identities to grant the managed application access to additional existing resources."
+            },
+            "defaultValue": {
+              "systemAssignedIdentity": "OnOnly"
+            },
+            "options": {
+              "hideSystemAssignedIdentity": false,
+              "hideUserAssignedIdentity": true
+            },
+            "visible": true
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "location": "[location()]",
+      "aksName": "[basics('aksName')]",
+      "nodeSize": "[basics('nodeSize')]",
+      "nodeCount": "[basics('nodeCount')]",
+      "managedIdentity": "[steps('managedIdentitySettings').appManagedIdentity]"
+    }
+  }
+}

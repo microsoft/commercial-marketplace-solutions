@@ -1,6 +1,5 @@
 # Azure Marketplace Managed Apps Accelerator ToolKit
 
-## Azure Marketplace Managed Apps metered billing Tool kits
 This repository contains several reference implementations of solutions to emit metered billing usage events from within an Azure Managed Application. 
 
 ## PowerShell script

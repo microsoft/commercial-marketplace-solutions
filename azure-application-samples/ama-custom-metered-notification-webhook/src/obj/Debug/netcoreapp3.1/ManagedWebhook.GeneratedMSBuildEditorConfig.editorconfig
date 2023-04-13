@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = ManagedWebhook
+build_property.ProjectDir = c:\github\commercial-marketplace-managed-application-metering-samples\function\ama-custom-billing-notification-webhook\src\

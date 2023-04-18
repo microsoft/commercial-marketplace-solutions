@@ -23,10 +23,15 @@ Now you can access the webapp at http://localhost:5000
 ## How to Validate an ARM Template
 1. Once the image is running go to http://localhost:5000
 2. Upload ARM Template(s)
+
 ![image](./images/image1.png)
+
 3. Click Validate and the Summary result will show as following
+
 ![image](./images/image2.png)
+
 4. Click **Show Detail Scanning Results** to show scan detail
+
 ![image](./images/image3.png)
 
 

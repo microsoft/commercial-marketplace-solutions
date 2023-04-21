@@ -18,11 +18,11 @@ A sample that will allow you to posting events to metered billing API in a Manag
     1. After opening IE, set the custom security settings to allow downloads.
 1. Download this repository's code as a ZIP file [from this URL](https://github.com/dstarr/ama-cu/archive/refs/heads/main.zip).
 1. In PowerShell, navigate to the `/vm/ps` folder on the VM.
-    1. Run the command `notepad ./RunIt.ps1`.
-    1. Open the [RunIt](./vm/ps/RunIt.ps1) file and see the arguments you need to pass to the Invoke-Meter function.
+    1. Run the command `notepad ./ps/RunIt.ps1`.
+    1. Open the [RunIt](./ps/RunIt.ps1) file and see the arguments you need to pass to the Invoke-Meter function.
     1. Provide the correct values for the arguments.
     1. Run the command `Set-ExecutionPolicy Bypass`.
-    1. Run the command `./RunIt.ps1`.
+    1. Run the command `./ps/RunIt.ps1`.
 1. The results of the call will be show at the bottom of the terminal window after the script runs.
     1. When the meter has been posted successfully it will show the output of the reply JSON at the bottom of the screen.
-    1. If there is an error - The meter did not get called or the meter is a duplicate of one sent earlier. The error message will indicate which.
+    1. If there is an error the meter did not get called or the meter is a duplicate of one sent earlier. The error message will indicate which.

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SaaS.Metering.Processing": {
+      "commandName": "Project"
+
+    }
+  }
+}

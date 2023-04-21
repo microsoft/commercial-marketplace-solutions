@@ -1,0 +1,118 @@
+﻿@model ArmValidation.Models.MultipleFilesModel
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<br />
+<form  method="post" enctype="multipart/form-data">
+    @if (Model.IsResponse)
+    {
+        if (Model.IsSuccess)
+        {
+            <div class="alert alert-success">
+                @Model.Message
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                @Model.Message
+            </div>
+        }
+    } 
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <label class="col-form-label">Uploade ARM Template Files</label>
+            <input asp-for="Files" class="form-control" multiple/>
+            <span asp-validation-for="Files" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Validate Files</button>
+        </div>
+    </div>
+</form>
+
+
+@if (Model.IsSuccess)
+{
+    <hr />
+    <label for="chkLabel">
+        <input type="checkbox" id="chkDetail" />
+        Show Detail Scanning Results
+    </label>
+
+    <div id="dvSummary" style="display: block">
+
+
+        @foreach (var line in Model.SummaryLines)
+        {
+            if (line.Contains("[?]"))
+            {
+                <span style="background-color:yellow">@line</span>
+
+                <br />
+            }
+            else
+            {
+                if (line.Contains("[-]"))
+                {
+                    <span style="color:red">@line</span>
+
+                    <br />
+                }
+                else
+                {
+                    <span>@line</span>
+
+                    <br />
+                }
+            }
+        }
+
+
+    </div>
+    <div id="dvDetail" style="display: none">
+        @foreach (var line in Model.DetailLines)
+        {
+            if (line.Contains("[?]"))
+            {
+                <span style="background-color:yellow">@line</span>
+
+                <br />
+            }
+            else
+            {
+                if (line.Contains("[-]"))
+                {
+                    <span style="color:red">@line</span>
+
+                    <br />
+                }
+                else
+                {
+                    <span>@line</span>
+
+                    <br />
+                }
+            }
+        }
+
+    </div>
+}
+
+ <script type="text/javascript">
+    $(function () {
+        $("#chkDetail").click(function () {
+            if ($(this).is(":checked")) {
+                $("#dvDetail").show();
+                $("#dvSummary").hide();
+            } else {
+                $("#dvDetail").hide();
+                $("#dvSummary").show();
+            }
+        });
+    });
+</script>

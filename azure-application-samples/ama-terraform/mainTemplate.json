@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deploymentScripts_TerraformDeployment_name": {
+            "defaultValue": "TerraformDeployment",
+            "type": "String"
+        },
+        "clientId": {
+        "type": "string"
+        },
+        "clientSecret": {
+        "type": "string"
+        },
+        "azureAdTenant": {
+        "type": "securestring",
+        "metadata": {
+            "description": "Password for the Virtual Machine."
+        }
+        },
+        "azureAdSubscription": {
+        "type": "string"
+        },
+        "location": {
+        "type": "string"
+        },
+
+        "storageAccountName": {
+        "type": "string"
+        }
+    },
+    "variables": {
+      "terraformLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/terraform')]",
+      "maintfLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/main.tf')]",
+      "variabletfLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/variables.tf')]",
+      "managedApplicationId": "[resourceGroup().managedBy]",
+      "applicationResourceGroupName": "[split(variables('managedApplicationId'), '/')[4]]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('deploymentScripts_TerraformDeployment_name')]",
+            "location": "eastus",
+            "kind": "AzureCLI",
+            "properties": {
+                "azCliVersion": "2.32.0",
+                "scriptContent": "[concat('export ARM_CLIENT_ID=',parameters('clientId'),';export ARM_SUBSCRIPTION_ID=',parameters('azureAdSubscription'),';export ARM_TENANT_ID=',parameters('azureAdTenant'),';export ARM_CLIENT_SECRET=',parameters('clientSecret'),';chmod +x ./terraform ;./terraform init;./terraform apply -input=false -auto-approve -var resource_group_name=',variables('applicationResourceGroupName'),' -var storageAccountName=',parameters('storageAccountName'),' -var location=',parameters('location'))]",
+                "retentionInterval": "PT4H",
+                "timeout": "PT2H",
+                "containerSettings": {},
+                "cleanupPreference": "OnSuccess",
+                    "supportingScriptUris":[
+                   "[variables('terraformLocation')]",
+                   "[variables('maintfLocation')]",
+                   "[variables('variabletfLocation')]"
+                ]
+
+            }
+        }
+    ]
+}

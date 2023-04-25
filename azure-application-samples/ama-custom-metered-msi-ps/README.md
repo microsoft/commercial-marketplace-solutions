@@ -1,6 +1,6 @@
-# Deploy an Azure Managed App with built-in custom billing meter Using HTTP POST
+# Deploy an Azure Managed App with built-in custom billing meter Using HTTP POST with PowerShell
 
-This demo shows how to deploy Managed App with Function app to  emit meter usage events to marketplace using http trigger and request body.
+This demo shows how Powershell script to build a Function app to emit meter usage events to marketplace using http trigger and request body.
 
 ## Design
 
@@ -10,16 +10,20 @@ The following diagram shows the overall workflow for this demo
 
 ## Custom billing Senario
 
-This demo shows how to implement a custom billing using Azure http trigger function where usage information will be passed on request body. For this demo, we setup plan information as follows.
+This demo shows how to implement a custom billing using Azure http trigger function using PowerShell where usage information will be passed on request body. For this demo, we setup plan information as follows.
 
 ![diagram](./images/Diagram5.png)
 
-The Azure function will expect body as follows.
+The Azure function will expect body with following json elements.
 
 ```json
 {
-    "dimension" : "key",
-    "quantity"  : 1
+   "subscriptionId" : "<sub Guid>",
+    "dimension" : "",
+    "quantity"  : ,
+    "planId" : "<planId>",
+    "EffectiveStartTime" : ""
+
 }
 ```
 
@@ -42,7 +46,7 @@ ARM template expects the following configuration.
 
 ## Installation from Partner Center preview
 
-1. Use the contents of the `/azure-application-samples/ama-custom-billing-msi-trigger-with-request-body/arm` folder to create a ZIP file for your plan in Partner Center.
+1. Use the contents of the `/azure-application-samples/ama-custom-metered-msi-ps/arm` folder to create a ZIP file for your plan in Partner Center.
 1. Upload the ZIP file to the Technical Configuration page of the Azure Managed Application plan in Partner Center.
 1. Publish the plan. It will take some time for the plan to reach Preview stage.
 1. From Preview, purchase the plan.
@@ -60,8 +64,11 @@ ARM template expects the following configuration.
 
   ```json
   {
-    "dimension": "key",
-    "quantity" : 1
+   "subscriptionId" : "<sub Guid>",
+    "dimension" : "key",
+    "quantity"  : 1,
+    "planId" : "<planId>",
+    "EffectiveStartTime" : ""
   }
   ```
 

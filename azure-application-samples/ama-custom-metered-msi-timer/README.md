@@ -32,7 +32,7 @@ ARM template expects the following configuration
 
 ## Installation from Partner Center Preview
 
-1. Use the contents of the `/function/ama-custom-billing-msi-timer/arm` folder to create a ZIP file for your plan in Partner Center.
+1. Use the contents of the `/azure-application-samples/ama-custom-billing-msi-timer/arm` folder to create a ZIP file for your plan in Partner Center.
 1. Upload the ZIP file to the Technical Configuration page of the Azure Managed Application plan in Partner Center.
 1. Publish the plan. It will take some time for the plan to reach Preview stage.
 1. From Preview, purchase the plan.
@@ -43,7 +43,9 @@ ARM template expects the following configuration
 1. This demo is using **hourly timer** so event will emitted on top of each hour
 1. After deployment is complete, open **managed resource group**
 1. Open the created Application Insights resource
+
 ![diagram](./images/Diagram7.png)
+
 1. From logs, Run the following query. Make sure to wait till the top of the hour to see the emitting events
 
     ```text

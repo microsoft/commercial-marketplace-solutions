@@ -21,6 +21,7 @@ ARM template expects the following configuration
 
 1. **Variable artifacts** - ARM template will deploy function from a Zip file. This variable is used to reference to the location of the zip file
 2. ARM using resource type `Microsoft.Resources/deployments`
+
     ![diagram](./images/Diagram2.png)
 
     In order to pass the Partner center validation you need to update the resource name with the Customer PID Guid from Partner Center.
@@ -28,11 +29,12 @@ ARM template expects the following configuration
     ![diagram](./images/Diagram3.png)
 
 3. ARM Template will deploy function using `WEBSITE_RUN_FROM_PACKAGE` and expecting `functionpackage.zip` to place under `artifacts` folder.
+
 ![diagram](./images/Diagram4.png)
 
 ## Installation from Partner Center Preview
 
-1. Use the contents of the `/function/ama-custom-billing-msi-trigger/arm` folder to create a ZIP file for your plan in Partner Center.
+1. Use the contents of the `/azure-application-samples/ama-custom-billing-msi-trigger/arm` folder to create a ZIP file for your plan in Partner Center.
 1. Upload the ZIP file to the Technical Configuration page of the Azure Managed Application plan in Partner Center.
 1. Publish the plan. It will take some time for the plan to reach Preview stage.
 1. From Preview, purchase the plan.

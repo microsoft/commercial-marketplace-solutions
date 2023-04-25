@@ -55,7 +55,9 @@ Under plan technical configuration:
 
 1. Deploy the managed app as customer
 2. From publisher tenant open the solution resource group, open CosmosDB
+
 ![diagram](./images/Diagram4.png)
+
 3. Open **Data Explorer** and check container records. There should be a record for the newly created mananged app.
 
     ![diagram](./images/Diagram5.png)

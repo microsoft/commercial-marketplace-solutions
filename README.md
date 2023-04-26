@@ -5,15 +5,15 @@ This repository contains reference implementations and sample code for Microsoft
 ## Azure Application Offers
 
 1. [Using Virtual Machine to emit metered Example](./azure-application-samples/ama-vm-ps-metered/README.md)
-1. [Using Azure Function HTTP Trigger with header request to emit metered example](./azure-application-samples/ama-custom-billing-msi-trigger).
-1. [Using Azure Function HTTP Trigger with PowerShell script to emit metered example](./azure-application-samples/ama-custom-billing-msi-ps).
-1. [Using Azure Function HTTP Trigger and body request to emit metered exmaple](./azure-application-samples/ama-custom-billing-msi-trigger-with-request-body). 
-1. [Using Azure Function Timer to emit metered exmaple](./azure-application-samples/ama-custom-billing-msi-timer).
-1. [Post a metered billing event on creation from Managed Application Notification webhook](./azure-application-samples/ama-custom-billing-notification-webhook).
+1. [Using Azure Function HTTP Trigger with header request to emit metered example](./azure-application-samples/ama-custom-billing-msi-trigger)
+1. [Using Azure Function HTTP Trigger with PowerShell script to emit metered example](./azure-application-samples/ama-custom-billing-msi-ps)
+1. [Using Azure Function HTTP Trigger and body request to emit metered exmaple](./azure-application-samples/ama-custom-billing-msi-trigger-with-request-body) 
+1. [Using Azure Function Timer to emit metered exmaple](./azure-application-samples/ama-custom-billing-msi-timer)
+1. [Post a metered billing event on creation from Managed Application Notification webhook](./azure-application-samples/ama-custom-billing-notification-webhook)
 1. [Using Azure DevOps CI/CD to update azure application instance](./azure-application-samples/ama-azure-devops-cicd/README.md) 
-1. [Using Azure Application to create AKS and deploy Solution using helm](./azure-application-samples/ama-aks-helm/).
+1. [Using Azure Application to create AKS and deploy Solution using helm](./azure-application-samples/ama-aks-helm/)
 1. [Using Azure Appplication with Terraform](./azure-application-samples/ama-terrafrom)
-1. [Azure Application minimum deployment](./azure-application-samples/ama-blank).
+1. [Azure Application minimum deployment](./azure-application-samples/ama-blank)
 
 ## Azure Container Offers
 

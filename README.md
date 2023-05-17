@@ -12,7 +12,7 @@ This repository contains reference implementations and sample code for Microsoft
 1. [Post a metered billing event on creation from Managed Application Notification webhook](./azure-application-samples/ama-custom-billing-notification-webhook)
 1. [Using Azure DevOps CI/CD to update azure application instance](./azure-application-samples/ama-azure-devops-cicd/README.md) 
 1. [Using Azure Application to create AKS and deploy Solution using helm](./azure-application-samples/ama-aks-helm/)
-1. [Using Azure Appplication with Terraform](./azure-application-samples/ama-terrafrom)
+1. [Using Azure Appplication with Terraform to deploy AKS](./azure-application-samples/ama-aks-terrafrom)
 1. [Azure Application minimum deployment](./azure-application-samples/ama-blank)
 
 ## Azure Container Offers

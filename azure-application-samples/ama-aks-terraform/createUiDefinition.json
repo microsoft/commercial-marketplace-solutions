@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+      "basics": [],
+      "steps": [
+          {
+              "name": "clusterInfo",
+              "label": "Cluster Information",
+              "bladeTitle": "Cluster Information",
+              "elements": [
+                  {
+                      "name": "clusterName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Cluser Name",
+                       "toolTip": "Cluser Name",
+                       "placeholder": "Cluser Name",
+                       "visible": true,
+                       "constraints":{
+                        "regex": "[a-z][a-z0-9-]{3,12}$",
+                        "validationMessage": "Please enter 3-12 character name "
+                       }
+                    
+                  },
+                  {
+                    "name": "dnsPrefix",
+                     "type": "Microsoft.Common.TextBox",
+                     "label": "DNS Prefix",
+                     "toolTip": "DNS Prefix",
+                     "placeholder": "DNS Prefix",
+                     "visible": true,
+                     "constraints":{
+                        "regex": "[a-z][a-z0-9-]{3,5}$",
+                        "validationMessage": "Please enter 3-5 dns name "
+                     }
+                  
+                }
+              ]
+          }
+      ],
+      "outputs": {
+          "location": "[location()]",
+          "clusterName": "[steps('clusterInfo').clusterName]",
+          "dnsPrefix": "[steps('clusterInfo').dnsPrefix]"
+          
+      }
+  }
+}

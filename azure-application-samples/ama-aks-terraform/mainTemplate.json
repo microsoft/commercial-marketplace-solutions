@@ -1,0 +1,237 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+        "type": "string"
+        },
+       "dnsPrefix": {
+        "type": "string"
+        },
+        "clusterName": {
+        "type": "string"
+        }
+     
+    },
+    "variables": {
+      "terraformLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/terraform')]",
+      "filesLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/terraformfiles.zip')]",
+      "deployscript":"[uri(deployment().properties.templateLink.uri, 'deploy.sh')]",
+      "applicationResourceGroupName": "[resourceGroup().name]",
+      "azureSubscription" :  "[subscription().subscriptionId]",
+      "tf_tenant": "<ENTER PUBLISHER TENANT>",
+      "storageName": "[concat(parameters('clusterName'), uniqueString(resourceGroup().id))]",
+      "vaultSubscription": "<ENTER PUBLISHER KEY VAULT SUBSCRIPTION>",
+      "vaultResourceGroupName": "<ENTER PUBLISHER KEY VAULT RESOURCE GROUP>",
+      "vaultName": "<ENTER PUBLISHER KEY VAULT NAME>",
+      "aadappIdName": "<ENTER PUBLISHER SP CLIENT ID SECRET NAME>",
+      "aadappsecretName": "<ENTER PUBLISHER SP CLIENT SECRET SECRET NAME>"
+
+    },
+    "resources": [
+
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "pid-5bd1b89d-241b-4d1d-bdae-53b24dc58043-partnercenter",
+
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "tf_client_id": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "tf_client_secret": {
+              "type": "securestring",
+                "defaultValue": ""
+            },
+            "tf_tenant": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "azureSubscription": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "mg_resource_group": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "applicationResourceGroupName": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "clusterName": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "dnsPrefix": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "location": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "storageName": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "terraformLocation": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "filesLocation": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "deployscript": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "deploymentScripts_TerraformDeployment_name":
+            {
+                "type": "string",
+                "defaultValue": ""
+            }
+          },
+          "resources": [
+           {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('deploymentScripts_TerraformDeployment_name')]",
+            "location": "[parameters('location')]",
+
+            "kind": "AzureCLI",
+            "properties": {
+               "azCliVersion": "2.32.0",
+               "scriptContent": "chmod +x ./deploy.sh; ./deploy.sh",
+               "retentionInterval": "PT4H",
+               "timeout": "PT2H",
+               "containerSettings": {},
+                   "environmentVariables": [
+                    {
+                        "name": "ARM_CLIENT_ID",
+                        "value": "[parameters('tf_client_id')]"
+                    },
+                    {
+                        "name": "ARM_CLIENT_SECRET",
+                        "value": "[parameters('tf_client_secret')]"
+                    },
+                    {
+                        "name": "ARM_TENANT_ID",
+                        "value": "[parameters('tf_tenant')]"
+                    },
+                    {
+                        "name": "ARM_SUBSCRIPTION_ID",
+                        "value": "[parameters('azureSubscription')]"
+                    },
+                    {
+                        "name": "MG_RESOURCE_GROUP_ID",
+                        "value": "[parameters('mg_resource_group')]"
+                    },
+                    {
+                        "name": "MG_RESOURCE_GROUP_NAME",
+                        "value": "[parameters('applicationResourceGroupName')]"
+                    },
+                    {
+                        "name": "CLUSTER_NAME",
+                        "value": "[parameters('clusterName')]"
+                    },
+                    {
+                        "name": "DNS_PREFIX",
+                        "value": "[parameters('dnsPrefix')]"
+                    },
+                    {
+                        "name": "LOCATION",
+                        "value": "[parameters('location')]"
+                    },
+                    {
+                        "name": "TF_STORAGE_NAME",
+                        "Value": "[parameters('storageName')]"
+                    }
+                    ],
+               "supportingScriptUris":[
+                    "[parameters('terraformLocation')]",
+                    "[parameters('filesLocation')]",
+                    "[parameters('deployscript')]"
+                    ]
+
+            }
+        }
+
+          ],
+          "outputs": {
+          
+          }
+        },
+        "parameters": {
+            "tf_tenant": {
+              "value": "[variables('tf_tenant')]"
+            },
+            "azureSubscription": {
+              "value": "[variables('azureSubscription')]"
+            },
+            "mg_resource_group": {
+                "value": "[resourceGroup().id]"
+            },
+            "applicationResourceGroupName": {
+              "value": "[variables('applicationResourceGroupName')]"
+            },
+            "clusterName": {
+             "value": "[parameters('clusterName')]"
+            },
+            "dnsPrefix": {
+             "value": "[parameters('dnsPrefix')]"
+            },
+            "storageName": {
+                "value": "[variables('storageName')]"
+            },
+            "terraformLocation": {
+              "value": "[variables('terraformLocation')]"
+            },
+            "filesLocation": {
+              "value": "[variables('filesLocation')]"
+            },
+            "deployscript": {
+             "value": "[variables('deployscript')]"
+            },
+            "deploymentScripts_TerraformDeployment_name":
+            {
+                "value": "[variables('azureSubscription')]"
+            },
+
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          
+          "tf_client_secret": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(variables('vaultSubscription'), variables('vaultResourceGroupName'), 'Microsoft.KeyVault/vaults', variables('vaultName'))]"
+              },
+              "secretName": "[variables('aadappsecretName')]"
+          }
+          },
+          
+          "tf_client_id": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(variables('vaultSubscription'), variables('vaultResourceGroupName'), 'Microsoft.KeyVault/vaults', variables('vaultName'))]"
+              },
+              "secretName": "[variables('aadappIdName')]"
+            }
+          }
+
+        }
+      }
+    }
+    ]
+}

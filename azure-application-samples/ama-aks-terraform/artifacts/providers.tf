@@ -12,14 +12,14 @@ terraform {
     }
   }
   backend "azurerm" {
-    resource_group_name  = "msalem-aks"
-    storage_account_name = "msalemstorage"
-    container_name       = "terraform"
+    resource_group_name  = ""
+    storage_account_name = ""
+    container_name       = ""
     key                  = "prod.tfstate"
-    client_secret        = "L9P8Q~2U73KvPfThtytwtp5iFXQUPtXMuKF5ea.H"
-    client_id            = "0d995ae2-15e6-4e61-b4b3-f8dccf29f4aa"
-    subscription_id      = "c4a29eac-da9a-40d8-80ac-0dc69cdd51ca"
-    tenant_id            = "970d1b35-db9b-48b2-b163-32c001b79bf8"
+    client_secret        = ""
+    client_id            = ""
+    subscription_id      = ""
+    tenant_id            = ""
   }
 }
 

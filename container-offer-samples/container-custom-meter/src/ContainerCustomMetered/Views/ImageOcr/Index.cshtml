@@ -1,0 +1,28 @@
+﻿@model ContainerCustomMetered.Models.AzureImageViewModel
+
+<br />
+<br />
+
+<div class="row">
+    <section>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="file" name="files" multiple />
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Process File" />
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+<br/>
+<div  style="overflow-wrap : normal | break-word | anywhere; width:fit-content">
+    <textarea rows=15 cols="150" readonly>
+        @Model.Detail
+            </textarea>
+</div>

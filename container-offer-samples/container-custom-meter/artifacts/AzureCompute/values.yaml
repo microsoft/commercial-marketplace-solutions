@@ -1,0 +1,65 @@
+# Azure Vote UI control
+title: Azure Compute App
+global:
+  azure:
+    identity:
+      # Application's Managed Service Identity (MSI) Client ID. ClientID can be used to generate authentication token to communicate to external services like Microsoft Marketplace Metering API
+      clientId: "DONOTMODIFY" # Azure populates this value at deployment time
+    marketplace:
+      # id of the plan purchased for the Azure Marketplace Kubernetes application,to be used in usage event payload to metering api, for more information please refer: https://learn.microsoft.com/en-us/partner-center/marketplace/marketplace-metering-service-apis 
+      planId: "DONOTMODIFY" # Azure populates this value at deployment time
+    extension:
+      # resource id of the Azure Marketplace Kubernetes application,to be used in usage event payload to metering api, for more information please refer: https://learn.microsoft.com/en-us/partner-center/marketplace/marketplace-metering-service-apis 
+      resourceId: "DONOTMODIFY" # application's Azure Resource ID, Azure populates this value at deployment time
+    images:
+      frontend:
+        digest: <Enter digest>
+        image: azurecompute
+        registry: <Enter registry uri>
+      backend:
+        digest: <Enter digest>
+        image: mongo
+        registry: <Enter registry uri>
+      meteredengine:
+        digest: <Enter digest>
+        image: meteredengine
+        registry: <Enter registry uri>
+
+
+# MongoDB Admin
+mongoDBAdmin: root
+mongoDBPassword: secret
+database_url:
+database_collection: meters
+database_name: offerdb
+
+#Marketplace
+marketplace_api: https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31
+dims_list: "ocr|1,image|1,text|1"
+
+#Congnitive service
+cognitive_EndPoint:
+cognitive_Key:
+# Service controls
+serviceType: LoadBalancer
+appFrontLabel: azurecompute
+appBackLabel: mongodb
+appEngineLabel: meteredengine
+#ingressName
+
+# how many frontends do we want?
+replicaFrontCount: 1
+replicaBackCount: 1
+replicaEngineCount: 1
+
+## Where it will be deployed
+nameSpace: contoso
+
+
+
+
+
+
+
+
+

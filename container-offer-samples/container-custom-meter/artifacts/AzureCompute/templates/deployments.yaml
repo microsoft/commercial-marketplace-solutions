@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appBackLabel }}
+spec:
+  replicas: {{ .Values.replicaBackCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appBackLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appBackLabel }}
+        azure-extensions-usage-release-identifier: {{.Release.Name}}
+    spec:
+      containers:
+      - name: {{ .Values.appBackLabel }}
+        image: "{{ .Values.global.azure.images.backend.registry }}/{{ .Values.global.azure.images.backend.image }}@{{ .Values.global.azure.images.backend.digest }}"
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGODB_ROOT_PASSWORD
+          value: {{ .Values.mongoDBPassword }}
+        resources:
+          requests:
+            cpu: 250m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appFrontLabel }}
+spec:
+  replicas: {{ .Values.replicaFrontCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appFrontLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appFrontLabel }}
+        azure-extensions-usage-release-identifier: {{.Release.Name}}
+    spec:
+      containers:
+      - name: {{ .Values.appFrontLabel }}
+        image: "{{ .Values.global.azure.images.frontend.registry }}/{{ .Values.global.azure.images.frontend.image }}@{{ .Values.global.azure.images.frontend.digest }}" 
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        env:
+        - name: DATABASE_NAME
+          value: {{ .Values.database_name}}
+        - name: DATABASE_COLLECTION
+          value: {{ .Values.database_collection}}
+        - name: DATABASE_URL
+          value: mongodb://{{ .Values.mongoDBAdmin }}:{{ .Values.mongoDBPassword }}@{{ .Values.appBackLabel }}-svc.{{ .Values.nameSpace }}.svc.cluster.local:27017/
+        - name: COGNITIVE_KEY
+          value: {{ .Values.cognitive_Key}}
+        - name: COGNITIVE_ENDPOINT
+          value: {{ .Values.cognitive_EndPoint}}
+        - name: PORT
+          value: "80"
+---            
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appEngineLabel }}
+spec:
+  replicas: {{ .Values.replicaEngineCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appEngineLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appEngineLabel }}
+        azure-extensions-usage-release-identifier: {{.Release.Name}}
+    spec:
+      containers:
+      - name: {{ .Values.appEngineLabel }}
+        image: "{{ .Values.global.azure.images.meteredengine.registry }}/{{ .Values.global.azure.images.meteredengine.image }}@{{ .Values.global.azure.images.meteredengine.digest }}" 
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        env:
+        - name: DATABASE_NAME
+          value: {{ .Values.database_name}}
+        - name: DATABASE_COLLECTION
+          value: {{ .Values.database_collection}}
+        - name: DATABASE_URL
+          value: mongodb://{{ .Values.mongoDBAdmin }}:{{ .Values.mongoDBPassword }}@{{ .Values.appBackLabel }}-svc.{{ .Values.nameSpace }}.svc.cluster.local:27017/
+        - name: MARKETPLACE_API
+          value: {{ .Values.marketplace_api}}
+        - name: DIMS_LIST
+          value: {{ .Values.dims_list}}
+        - name: PORT
+          value: "80"
+        envFrom:
+        - configMapRef:
+            name: azure-compute-values
+            

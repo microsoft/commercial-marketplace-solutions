@@ -1,0 +1,34 @@
+﻿@model ContainerCustomMetered.Models.AzureImageViewModel
+
+<br />
+<br />
+
+<div class="row">
+    <section>
+        <form method="post" asp-controller="ImageAnalysis">
+            <div class="form-group">
+                <div class="col-md-10">
+                    <table width="90%">
+                        <tr>
+                            <th>Image URL:</th>
+                            <th width="85%">@Html.TextBoxFor(s => s.ImageURL, "Please Enter Image URL Here",  new { @class = "form-control", required = "required"})</th>
+                        </tr>
+                    </table>
+                    
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Process File" />
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+<br />
+<div style="overflow-wrap : normal | break-word | anywhere; width:fit-content">
+    <textarea rows=15 cols="150" readonly>
+        @Model.Detail
+            </textarea>
+</div>

@@ -1,0 +1,26 @@
+﻿@model ContainerCustomMetered.Models.AzureTextViewModel
+
+<br />
+<br />
+
+
+    <form method="post" asp-controller="TextSummary">
+            <span>Detail Text</span>
+    <div>
+                @Html.TextAreaFor(m => m.TextDetail, new { @style="  min-height:200px", row=30, cols=150})
+    </div>
+    <br />
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Process File" />
+                </div>
+            </div>
+    </form>
+
+<br />
+<span>Summary</span>
+<div style="overflow-wrap : normal | break-word | anywhere; width:fit-content">
+    <textarea rows=5 cols="150" readonly>
+        @Model.TextSummary
+     </textarea>
+</div>

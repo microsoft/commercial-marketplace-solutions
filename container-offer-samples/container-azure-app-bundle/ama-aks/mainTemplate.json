@@ -79,8 +79,8 @@
     "plan-name": "testplan",
     "plan-offerID": "kubernetest_apps_demo_offer",
     "plan-publisher": "test_test_mix3pptest0011614206850774",
-    "releaseTrain": "stable"
-    
+    "infra-rc": "stable",
+    "aml-rc": "stable"
   },
   "resources": [
         {
@@ -335,7 +335,7 @@
         }
       }
     },
-    {
+        {
             "apiVersion": "2022-04-02-preview",
             "dependsOn": [
                 "[variables('identityName')]",
@@ -343,6 +343,67 @@
                 "get-aks-mi",
                 "[concat('ra-',guid(resourceGroup().id))]",
                 "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]"
+            ],
+            "name": "[variables('infra-rc')]",
+            "plan": {
+                "name": "[variables('plan-name')]",
+                "product": "[variables('plan-offerID')]",
+                "publisher": "[variables('plan-publisher')]"
+            },
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "configurationProtectedSettings": {},
+                "configurationSettings": {
+                    "title": "[parameters('extensionTitle')]",
+                    "value1": "[parameters('extensionVoteValue1')]",
+                    "value2": "[parameters('extensionVoteValue2')]"
+                },
+                "extensionType": "[variables('clusterExtensionTypeName')]",
+                "releaseTrain": "[variables('releaseTrain')]"
+            },
+            "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
+            "type": "Microsoft.KubernetesConfiguration/extensions"
+       },
+              {
+            "apiVersion": "2022-04-02-preview",
+            "dependsOn": [
+                "[variables('identityName')]",
+                "[parameters('aksName')]",
+                "get-aks-mi",
+                "[concat('ra-',guid(resourceGroup().id))]",
+                "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
+                 "[variables('infra-rc')]"
+            ],
+            "name": "[variables('aml-rc')]",
+            "plan": {
+                "name": "[variables('plan-name')]",
+                "product": "[variables('plan-offerID')]",
+                "publisher": "[variables('plan-publisher')]"
+            },
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "configurationProtectedSettings": {},
+                "configurationSettings": {
+                    "title": "[parameters('extensionTitle')]",
+                    "value1": "[parameters('extensionVoteValue1')]",
+                    "value2": "[parameters('extensionVoteValue2')]"
+                },
+                "extensionType": "[variables('clusterExtensionTypeName')]",
+                "releaseTrain": "[variables('releaseTrain')]"
+            },
+            "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
+            "type": "Microsoft.KubernetesConfiguration/extensions"
+       },
+    {
+            "apiVersion": "2022-04-02-preview",
+            "dependsOn": [
+                "[variables('identityName')]",
+                "[parameters('aksName')]",
+                "get-aks-mi",
+                "[concat('ra-',guid(resourceGroup().id))]",
+                "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
+                "[variables('infra-rc')]",
+                
             ],
             "name": "[parameters('extensionName')]",
             "plan": {

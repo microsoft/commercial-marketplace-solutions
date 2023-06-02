@@ -30,7 +30,7 @@
         },
         "dimensionConfig": {
             "type": "string",
-            "defaultValue": "[[{\"dimension\":\"cu\", \"quantity\":1}]",
+            "defaultValue": "[[{\"dimension\":\"create\", \"quantity\":1}, {\"dimension\":\"key\", \"quantity\":1000}]",
             "metadata": {
                 "description": "The dimension and quantity config for the chron job to send billing metrics."
             }

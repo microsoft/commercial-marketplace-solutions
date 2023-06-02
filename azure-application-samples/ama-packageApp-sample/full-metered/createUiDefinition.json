@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "username",
+        "type": "Microsoft.Common.TextBox",
+        "label": "User name",
+        "defaultValue": "",
+        "toolTip": "Use only allowed characters",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z0-9A-Z]{6,30}$",
+          "validationMessage": "Only alphanumeric characters are allowed, and the value must be 6-30 characters long."
+        },
+        "visible": true
+      },
+      {
+        "name": "password",
+        "type": "Microsoft.Compute.CredentialsCombo",
+        "label": {
+          "password": "Password",
+          "confirmPassword": "Confirm password"
+        },
+        "toolTip": {
+          "password": "Provide a password"
+        },
+        "constraints": {
+          "required": true
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "osPlatform": "Windows",
+        "visible": true
+      },
+      {
+        "name": "dnsPrefix",
+        "type": "Microsoft.Common.TextBox",
+        "label": "DNS prefix",
+        "defaultValue": "",
+        "toolTip": "Use only allowed characters",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9]{3, 10}$",
+          "validationMessage": "Only alphanumeric characters are allowed, and the value must be 6-30 characters long."
+        },
+        "visible": true
+      }
+    ],
+    "steps": [],
+    "outputs": {
+      "adminUsername": "[basics('username')]",
+      "adminPassword": "[basics('password').password]",
+      "dnsLabelPrefix": "[basics('dnsPrefix')]",
+      "location": "[location()]"
+    }
+  }
+}

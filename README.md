@@ -1,4 +1,4 @@
-# Commercial Marketplace Samples Resource Index
+# Commercial Marketplace Solutions Resource Index
 
 This repository contains reference implementations and sample code for Microsoft commercial marketplace offers. These samples are intended to be used as a reference for building your own offers and are offered as a starting point for your solutions.
 
@@ -26,6 +26,6 @@ This repository contains reference implementations and sample code for Microsoft
 1. [Implement SaaS Solution with Metered Billing Accelerator](https://github.com/microsoft/metered-billing-accelerator/tree/main/src/Demos/SaaSIntegration)
 
 
-## Misc samples
+## Misc Solutions
 
 1. [ARM-TTK Container WebApp](./arm-ttk-web/)

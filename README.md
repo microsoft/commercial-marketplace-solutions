@@ -1,6 +1,6 @@
 # Commercial Marketplace Solutions Resource Index
 
-This repository contains reference implementations and sample code for Microsoft commercial marketplace offers. These samples are intended to be used as a reference for building your own offers and are offered as a starting point for your solutions.
+This repository contains reference implementations and solutions for the implementation of  Microsoft commercial marketplace offers. These solutions are intended to be used as a reference for building your own offers and are offered as a starting point for your solutions.
 
 ## Azure Application Offers
 

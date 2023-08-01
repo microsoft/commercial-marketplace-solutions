@@ -18,6 +18,7 @@ ARM template expects the following configuration
 
 1. **Variable artifacts** - ARM template will deploy function from a Zip file. This variable is used to reference to the location of the zip file
 1. **DIMENSION_CONFIG** - predefined dimensions and quantities that the function will use to emit usage event to Azure marketplace
+1. **PLAN NAME** - Offer Plan Name
 1. ARM using resource type `Microsoft.Resources/deployments`
 
     ![diagram](./images/Diagram2.png)

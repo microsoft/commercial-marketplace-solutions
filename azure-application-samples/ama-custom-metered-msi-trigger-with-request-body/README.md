@@ -19,7 +19,8 @@ The Azure function will expect body as follows.
 ```json
 {
     "dimension" : "key",
-    "quantity"  : 1
+    "quantity"  : 1,
+    "planId"    : "test"
 }
 ```
 
@@ -56,12 +57,13 @@ ARM template expects the following configuration.
 
   ![diagram](./images/Diagram7.png)
 
-4. In the Testing Panel, Under **Body** Section, add the following 
+4. In the Testing Panel, Under **Body** Section, add something like the following example 
 
   ```json
   {
     "dimension": "key",
-    "quantity" : 1
+    "quantity" : 1,
+    "planId" : "test"
   }
   ```
 

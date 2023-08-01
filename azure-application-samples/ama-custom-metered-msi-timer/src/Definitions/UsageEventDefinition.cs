@@ -10,7 +10,7 @@ namespace ManagedWebhook.Definitions
         /// <summary>
         /// Identifier of the resource against which usage is emitted.
         /// </summary>
-        public string ResourceId { get; set; }
+        public string ResourceUri { get; set; }
 
         /// <summary>
         /// The quantity of the usage.

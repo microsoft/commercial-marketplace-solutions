@@ -15,17 +15,17 @@ namespace ManagedWebhook
     {
         [FunctionName("CronJob")]
         public static async Task Run(
-            [TimerTrigger("0 0 0/1 * * *")]TimerInfo timerInfo,
+            [TimerTrigger("0 0 0/1 * * *")] TimerInfo timerInfo,
             ILogger log,
             ExecutionContext context)
         {
             var config = new ConfigurationBuilder()
              .SetBasePath(context.FunctionAppDirectory)
-             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
              .AddEnvironmentVariables()
              .Build();
 
             var dimensionConfigs = JsonConvert.DeserializeObject<DimensionConfig[]>(config["DIMENSION_CONFIG"]);
+            var planName = config["PLAN_NAME"];
             log.LogTrace($"Dimension configs: {JsonConvert.SerializeObject(dimensionConfigs)}");
 
             using (var armHttpClient = HttpClientFactory.Create())
@@ -34,28 +34,22 @@ namespace ManagedWebhook
                 armHttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {armToken}");
 
                 var applicationResourceId = await CronJob.GetResourceGroupManagedBy(config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
-                var application = await CronJob.GetApplication(applicationResourceId, config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
+                log.LogInformation($"Authorization bearer token: {armToken}");
 
-                if (application != null)
+                foreach (var dimensionConfig in dimensionConfigs)
                 {
-                    log.LogInformation($"Authorization bearer token: {armToken}");
-                    log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
-                    log.LogInformation($"Plan name: {application.Plan.Name}");
-
-                    foreach (var dimensionConfig in dimensionConfigs)
+                    var response = await CronJob.EmitUsageEvents(config, armHttpClient, dimensionConfig, applicationResourceId, planName).ConfigureAwait(continueOnCapturedContext: false);
+                    var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
+                    if (response.IsSuccessStatusCode)
                     {
-                        var response = await CronJob.EmitUsageEvents(config, armHttpClient, dimensionConfig, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
-                        var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
-                        }
-                        else
-                        {
-                            log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
-                        }
+                        log.LogTrace($"Successfully emitted a usage event. Reponse body: {responseBody}");
+                    }
+                    else
+                    {
+                        log.LogError($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
                     }
                 }
+
             }
         }
 
@@ -105,34 +99,16 @@ namespace ManagedWebhook
             return resourceGroup?.ManagedBy;
         }
 
-        /// <summary>
-        /// Gets the application.
-        /// </summary>
-        private static async Task<ApplicationDefinition> GetApplication(string applicationResourceId, IConfigurationRoot config, HttpClient httpClient, ILogger log)
-        {
-            if (applicationResourceId == null)
-            {
-                return null;
-            }
 
-            var getApplicationResponse = await httpClient.GetAsync($"https://management.azure.com{applicationResourceId}?api-version=2019-07-01").ConfigureAwait(continueOnCapturedContext: false);
-            if (getApplicationResponse?.IsSuccessStatusCode != true)
-            {
-                log.LogError("Failed to get the appplication from ARM.");
-                return null;
-            }
-
-            return await getApplicationResponse.Content.ReadAsAsync<ApplicationDefinition>().ConfigureAwait(continueOnCapturedContext: false);
-        }
 
         /// <summary>
         /// Emits the usage event to the configured MARKETPLACEAPI_URI.
         /// </summary>
-        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, DimensionConfig dimensionConfig, string resourceUsageId, string planId)
+        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, DimensionConfig dimensionConfig, string resourceUri, string planId)
         {
             var usageEvent = new UsageEventDefinition
             {
-                ResourceId = resourceUsageId,
+                ResourceUri = resourceUri,
                 Quantity = dimensionConfig.Quantity,
                 Dimension = dimensionConfig.Dimension,
                 EffectiveStartTime = DateTime.UtcNow,

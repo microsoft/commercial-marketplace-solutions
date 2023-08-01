@@ -28,7 +28,6 @@ namespace ManagedWebhook
             
             var config = new ConfigurationBuilder()
              .SetBasePath(context.FunctionAppDirectory)
-             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
              .AddEnvironmentVariables()
              .Build();
 
@@ -42,28 +41,30 @@ namespace ManagedWebhook
                 armHttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {armToken}");
 
                 var applicationResourceId = await Webhook.GetResourceGroupManagedBy(config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
-                var application = await Webhook.GetApplication(applicationResourceId, config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
 
-                if (application != null)
-                {
                         
                         if((usageRequest.Quantity == null)||(usageRequest.Quantity<=0))
-                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
+                            return new BadRequestObjectResult("Please pass a quantity in the request body");
 
 
                         if(String.IsNullOrEmpty(usageRequest.Dimension))
-                            return new BadRequestObjectResult("Please pass a dimension on the query string or in the request body");
+                            return new BadRequestObjectResult("Please pass a dimension the request body");
 
-                        usageRequest.EffectiveStartTime=DateTime.UtcNow;
+                if (String.IsNullOrEmpty(usageRequest.PlanId))
+                    return new BadRequestObjectResult("Please pass a PlanID the request body");
+
+
+
+                usageRequest.EffectiveStartTime=DateTime.UtcNow;
 
                         //log.LogInformation($"Authorization bearer token: {armToken}");
-                        log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
-                        log.LogInformation($"Plan name: {application.Plan.Name}");
+                        log.LogInformation($"Resource usage id: {applicationResourceId}");
+                        log.LogInformation($"Plan name: {usageRequest.PlanId}");
                         log.LogInformation($"Dimension: {usageRequest.Dimension}");
                         log.LogInformation($"Quantity: {usageRequest.Quantity}");
 
 
-                        var response = await Webhook.EmitUsageEvents(config, armHttpClient, usageRequest.Dimension,usageRequest.Quantity,usageRequest.EffectiveStartTime, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
+                        var response = await Webhook.EmitUsageEvents(config, armHttpClient, usageRequest.Dimension,usageRequest.Quantity,usageRequest.EffectiveStartTime, applicationResourceId, usageRequest.PlanId).ConfigureAwait(continueOnCapturedContext: false);
                         var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
                         if (response.IsSuccessStatusCode)
                         {
@@ -76,9 +77,6 @@ namespace ManagedWebhook
                                 return new BadRequestObjectResult($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
                         }
 
-                }
-                else
-                        return new BadRequestObjectResult($"Failed to retreive application information");
             }
         }
 
@@ -128,34 +126,16 @@ namespace ManagedWebhook
             return resourceGroup?.ManagedBy;
         }
 
-        /// <summary>
-        /// Gets the application.
-        /// </summary>
-        private static async Task<ApplicationDefinition> GetApplication(string applicationResourceId, IConfigurationRoot config, HttpClient httpClient, ILogger log)
-        {
-            if (applicationResourceId == null)
-            {
-                return null;
-            }
-
-            var getApplicationResponse = await httpClient.GetAsync($"https://management.azure.com{applicationResourceId}?api-version=2019-07-01").ConfigureAwait(continueOnCapturedContext: false);
-            if (getApplicationResponse?.IsSuccessStatusCode != true)
-            {
-                log.LogError("Failed to get the appplication from ARM.");
-                return null;
-            }
-
-            return await getApplicationResponse.Content.ReadAsAsync<ApplicationDefinition>().ConfigureAwait(continueOnCapturedContext: false);
-        }
+  
 
         /// <summary>
         /// Emits the usage event to the configured MARKETPLACEAPI_URI.
         /// </summary>
-        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,double quantity,DateTime  effectiveStartTime,string resourceUsageId, string planId)
+        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,double quantity,DateTime  effectiveStartTime,string resourceUri, string planId)
         {
             var usageEvent = new UsageEventDefinition
             {
-                ResourceId = resourceUsageId,
+                ResourceUri = resourceUri,
                 Quantity = quantity,
                 Dimension = dimension,
                 EffectiveStartTime = effectiveStartTime,

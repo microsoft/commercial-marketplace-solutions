@@ -38,7 +38,7 @@ namespace ManagedWebhook
             // this is mandatory
             string quantity = req.Query["quantity"];
             string dimension = req.Query["dimension"];
-
+            string planId = req.Query["planId"];
             // this is optional
             string dt = req.Query["effectiveStartTime"];
 
@@ -48,6 +48,7 @@ namespace ManagedWebhook
 
             if(dimension == null)
                 return new BadRequestObjectResult("Please pass a dimension on the query string or in the request header");
+
 
             if(dt != null)
                 effectiveStartTime=DateTime.Parse(dt);
@@ -60,17 +61,14 @@ namespace ManagedWebhook
                 armHttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {armToken}");
 
                 var applicationResourceId = await Webhook.GetResourceGroupManagedBy(config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
-                var application = await Webhook.GetApplication(applicationResourceId, config, armHttpClient, log).ConfigureAwait(continueOnCapturedContext: false);
 
-                if (application != null)
-                {
                     //log.LogInformation($"Authorization bearer token: {armToken}");
-                    log.LogInformation($"Resource usage id: {application.Properties.BillingDetails?.ResourceUsageId}");
-                    log.LogInformation($"Plan name: {application.Plan.Name}");
+                    log.LogInformation($"Resource ResourceUri: {applicationResourceId}");
+                    log.LogInformation($"Plan Id: {planId}");
                     log.LogInformation($"Dimension: {dimension}");
                     log.LogInformation($"Quantity: {quantity}");
 
-                    var response = await Webhook.EmitUsageEvents(config, armHttpClient, dimension,quantity,effectiveStartTime, application.Properties.BillingDetails?.ResourceUsageId, application.Plan.Name).ConfigureAwait(continueOnCapturedContext: false);
+                    var response = await Webhook.EmitUsageEvents(config, armHttpClient, dimension,quantity,effectiveStartTime, applicationResourceId, planId).ConfigureAwait(continueOnCapturedContext: false);
                     var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
                     if (response.IsSuccessStatusCode)
                     {
@@ -83,9 +81,7 @@ namespace ManagedWebhook
                             return new BadRequestObjectResult($"Failed to emit a usage event. Error code: {response.StatusCode}. Failure cause: {response.ReasonPhrase}. Response body: {responseBody}");
                     }
                     
-                }
-                else
-                        return new BadRequestObjectResult($"Failed to retreive application information");
+
             }
         }
 
@@ -136,33 +132,13 @@ namespace ManagedWebhook
         }
 
         /// <summary>
-        /// Gets the application.
-        /// </summary>
-        private static async Task<ApplicationDefinition> GetApplication(string applicationResourceId, IConfigurationRoot config, HttpClient httpClient, ILogger log)
-        {
-            if (applicationResourceId == null)
-            {
-                return null;
-            }
-
-            var getApplicationResponse = await httpClient.GetAsync($"https://management.azure.com{applicationResourceId}?api-version=2019-07-01").ConfigureAwait(continueOnCapturedContext: false);
-            if (getApplicationResponse?.IsSuccessStatusCode != true)
-            {
-                log.LogError("Failed to get the appplication from ARM.");
-                return null;
-            }
-
-            return await getApplicationResponse.Content.ReadAsAsync<ApplicationDefinition>().ConfigureAwait(continueOnCapturedContext: false);
-        }
-
-        /// <summary>
         /// Emits the usage event to the configured MARKETPLACEAPI_URI.
         /// </summary>
-        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,string quantity,DateTime  effectiveStartTime,string resourceUsageId, string planId)
+        private static async Task<HttpResponseMessage> EmitUsageEvents(IConfigurationRoot config, HttpClient httpClient, string dimension,string quantity,DateTime  effectiveStartTime,string resourceUri, string planId)
         {
             var usageEvent = new UsageEventDefinition
             {
-                ResourceId = resourceUsageId,
+                ResourceUri = resourceUri,
                 Quantity = double.Parse(quantity),
                 Dimension = dimension,
                 EffectiveStartTime = effectiveStartTime,

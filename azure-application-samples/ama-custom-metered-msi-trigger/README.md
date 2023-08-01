@@ -62,6 +62,13 @@ ARM template expects the following configuration
     Value = 1
     ```
 
+1. Click **Add parameter** and enter the following
+
+    ```text
+    Name = plan
+    Value = testplan
+    ```
+    
     ![diagram](./images/Diagram8.png)
 
 1. Click **Run** and you should see the following successful emitting event.

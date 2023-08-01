@@ -24,6 +24,8 @@ namespace ManagedWebhook.Definitions
         public DateTime EffectiveStartTime { get; set; }
 
 
+        /// </summary>
+        public string PlanId { get; set; }
         /// <summary>
         /// Result of emitting to marketplace
         /// </summary>

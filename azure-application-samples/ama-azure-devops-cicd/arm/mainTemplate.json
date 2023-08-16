@@ -73,15 +73,11 @@
         "artifacts":   "[uri(deployment().properties.templateLink.uri, 'artifacts/webpackage.zip')]",
         "webAppName": "[concat(parameters('webAppName'), uniqueString(resourceGroup().id))]",
         "appServicePlanPortalName": "[concat('AppServicePlan-', variables('webAppName'))]"
-
-  
-
-
     },
     "resources": [
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-11-01",
+            "apiVersion": "2022-07-01",
             "name": "[variables('vmVNetName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -108,7 +104,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-11-01",
+            "apiVersion": "2022-07-01",
             "name": "NSG",
             "location": "[parameters('location')]",
             "properties": {
@@ -146,7 +142,7 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2019-11-01",
+            "apiVersion": "2022-07-01",
             "name": "[variables('publicIPAddressName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -155,7 +151,7 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2019-11-01",
+            "apiVersion": "2022-07-01",
             "name": "[variables('nicName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -181,7 +177,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2023-03-01",
             "name": "[concat(parameters('vmNamePrefix'), '-vm')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -224,7 +220,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageName')]",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2022-09-01",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
@@ -237,7 +233,7 @@
 
       {
             "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2022-03-01",
             "name": "[variables('appServicePlanPortalName')]",
             "location": "[parameters('location')]",
             "sku": {
@@ -246,7 +242,7 @@
           },
           {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2022-03-01",
             "kind": "app",
             "name": "[variables('webAppName')]",
             "location": "[parameters('location')]",

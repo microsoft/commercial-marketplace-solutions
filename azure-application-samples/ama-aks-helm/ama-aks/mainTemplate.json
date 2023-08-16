@@ -35,13 +35,7 @@
       "metadata": {
         "description": "Manually set flag whether to use delegatedManagedIdentityResourceId or not in role assignments"
       }
-    },
-    "guidValue": {
-      "type": "string",
-      "defaultValue": "[newGuid()]"
     }
-
-
   },
   "variables": {
     "adminUsername": "[concat('azureuser')]",
@@ -49,7 +43,7 @@
     "logAnalyticsWorkspaceName": "[concat(parameters('aksName'),uniqueString(resourceGroup().id))]",
     "identityName": "[concat(parameters('aksName'),'-identity')]",
     "nodeResourceGroup": "[concat(resourceGroup().name,'-aks-rg')]",
-    "roleDefinitionOwner": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+    "roleDefinitionContributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
     "roleDefinitionManagedIdentityOperator": "f1a07417-d97a-45cb-824c-7a7467783830",
     "roleDefinitionVirtualMachineContributor": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c",
     "roleDefinitionMonitoringMetricsPublisher": "3913510d-42f4-4e42-8a64-420c390055eb",
@@ -61,7 +55,7 @@
       "comments": "*** Azure Marketplace required usage attribution tracking GUID ***",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
-      "name": "pid-5bd1b89d-241b-4d1d-bdae-53b24dc58043-partnercenter",
+      "name": "pid-GUID-partnercenter",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -83,12 +77,12 @@
       "comments": "*** Assign Owner role to the Managed Resource Group using cross-tenant delegatedManagedIdentityResourceId property ***",
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2021-04-01-preview",
-      "name": "[guid(resourceGroup().id, variables('identityName'), variables('roleDefinitionOwner'))]",
+      "name": "[guid(resourceGroup().id, variables('identityName'), variables('roleDefinitionContributor'))]",
       "dependsOn": [
         "[variables('identityName')]"
       ],
       "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions',variables('roleDefinitionOwner'))]",
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions',variables('roleDefinitionContributor'))]",
         "principalId": "[reference(variables('identityName')).principalId]",
         "principalType": "ServicePrincipal",
         "scope": "[resourceGroup().id]",
@@ -285,10 +279,10 @@
             {
               "comments": "*** Assign Owner role to the user assigned identity cross-tenant ***",
               "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2021-04-01-preview",
-              "name": "[guid(variables('nodeResourceGroup'), variables('identityName'), variables('roleDefinitionOwner'))]",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(variables('nodeResourceGroup'), variables('identityName'), variables('roleDefinitionContributor'))]",
               "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions',variables('roleDefinitionOwner'))]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions',variables('roleDefinitionContributor'))]",
                 "principalId": "[reference(variables('identityName')).principalId]",
                 "principalType": "ServicePrincipal",
                 "scope": "[concat(subscription().id,'/resourceGroups/',variables('nodeResourceGroup'))]",
@@ -298,7 +292,7 @@
             {
               "comments": "*** Assign Managed Identity Operator role to AKS' managed identity cross-tenant (for Pod Identity) ***",
               "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2021-04-01-preview",
+              "apiVersion": "2022-04-01",
               "name": "[guid(variables('nodeResourceGroup'), 'aksmi', variables('roleDefinitionManagedIdentityOperator'))]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions',variables('roleDefinitionManagedIdentityOperator'))]",

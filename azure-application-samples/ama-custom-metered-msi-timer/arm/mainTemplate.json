@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "storageAccountPrefix": {
@@ -21,53 +21,34 @@
                 "description": "Location for the resources."
             }
         },
-        "functionName": {
-            "type": "string",
-            "defaultValue": "[uniqueString(resourceGroup().id)]",
-            "metadata": {
-                "description": "Unique name of the function app to be created."
-            }
-        },
-        "dimensionConfig": {
-            "type": "string",
-            "defaultValue": "[[{\"dimension\":\"create\", \"quantity\":1}, {\"dimension\":\"key\", \"quantity\":1000}]",
-            "metadata": {
-                "description": "The dimension and quantity config for the chron job to send billing metrics."
-            }
-        },
         "planName": {
             "type": "string",
             "defaultValue": "ENTER PLAN NAME HERER",
             "metadata": {
                 "description": "The dimension and quantity config for the chron job to send billing metrics."
             }
-        },
-        "marketplaceUri": {
-            "type": "string",
-            "defaultValue": "https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31",
-            "metadata": {
-                "description": "The marketplace URI that the app calls to report usage."
-            }
-        },
-        "resourceGroupRoleAssignment": {
-            "type": "string",
-            "defaultValue": "[newGuid()]"
         }
 
     },
     "variables": {
-        "resourceName": "[toLower(take(concat(parameters('functionName'),uniqueString(resourceGroup().id)),24))]",
+        "functionName": "[uniqueString(resourceGroup().id)]",
+        "resourceName": "[toLower(take(concat(variables('functionName'),uniqueString(resourceGroup().id)),24))]",
         "storageAccountName": "[variables('resourceName')]",
         "appInsightsName": "[variables('resourceName')]",
-        "msiAccessRoleId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+        "dimensionConfig": "[[{\"dimension\":\"create\", \"quantity\":1}, {\"dimension\":\"key\", \"quantity\":1000}]",
+        "marketplaceUri": "https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31",
+        "msiAccessRoleId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
         "storageName": "[concat(parameters('storageAccountPrefix'), uniqueString(resourceGroup().id))]",
-        "artifacts":   "[uri(deployment().properties.templateLink.uri, 'artifacts/functionpackage.zip')]"
+        "artifacts":   "[uri(deployment().properties.templateLink.uri, 'artifacts/functionpackage.zip')]",
+        "planName" : "ENTER PLAN ID HERE"
+
+
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageName')]",
-            "apiVersion": "2021-08-01",
+            "apiVersion": "2022-09-01",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
@@ -79,7 +60,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2021-08-01",
+            "apiVersion": "2022-09-01",
             "name": "[variables('storageAccountName')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
@@ -102,8 +83,8 @@
         },
         {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2021-03-01",
-            "name": "[parameters('functionName')]",
+            "apiVersion": "2022-03-01",
+            "name": "[variables('functionName')]",
             "location": "[parameters('location')]",
             "kind": "functionapp",
             "identity": {
@@ -114,17 +95,17 @@
                 "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
             ],
             "properties": {
-                "name": "[parameters('functionName')]",
+                "name": "[variables('functionName')]",
                 "siteConfig": {
                     "appSettings": [
                         
                         {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2022-09-01').keys[0].value)]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2022-09-01').keys[0].value)]"
                         },
                         {
                             "name": "AzureWebJobsSecretStorageType",
@@ -132,11 +113,11 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-02-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2022-09-01').keys[0].value)]"
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', variables('appInsightsName')), '2018-05-01-preview').InstrumentationKey]"
+                            "value": "[reference(resourceId('microsoft.insights/components/', variables('appInsightsName')), '2020-02-02').InstrumentationKey]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -152,15 +133,15 @@
                         },
                         {
                             "name": "DIMENSION_CONFIG",
-                            "value": "[parameters('dimensionConfig')]"
+                            "value": "[variables('dimensionConfig')]"
                         },
                         {
                             "name": "PLAN_NAME",
-                            "value": "[parameters('planName')]"
+                            "value": "[variables('planName')]"
                         },
                         {
                             "name": "MARKETPLACEAPI_URI",
-                            "value": "[parameters('marketplaceUri')]"
+                            "value": "[variables('marketplaceUri')]"
                         },
                         {
                             "name": "RESOURCEGROUP_ID",
@@ -174,17 +155,17 @@
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2021-04-01-preview",
-            "name": "[parameters('resourceGroupRoleAssignment')]",
+            "apiVersion": "2022-04-01",
+             "name": "[guid(resourceGroup().id)]",
             "properties": {
                 "roleDefinitionId": "[concat(subscription().id, '/providers/Microsoft.Authorization/roleDefinitions/', variables('msiAccessRoleId'))]",
-                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionName')), '2018-11-01', 'Full').identity.principalId]",
-                "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionName'))]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionName')), '2022-03-01', 'Full').identity.principalId]",
+                "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.Compute/sites', variables('functionName'))]",
                 "scope": "[resourceGroup().id]",
                 "principalType": "ServicePrincipal"
             },
             "dependsOn": [
-                "[concat('Microsoft.Web/sites/', parameters('functionName'))]"
+                "[resourceId('Microsoft.Web/sites/', variables('functionName'))]"
             ]
         }
         

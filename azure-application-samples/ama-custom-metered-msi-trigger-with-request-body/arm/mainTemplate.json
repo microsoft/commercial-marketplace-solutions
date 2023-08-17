@@ -29,7 +29,7 @@
         "delegatedManagedIdentityResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionName'))]",
         "functionResourceId": "[concat('Microsoft.Web/sites/', variables('functionName'))]",
         "marketplaceUri": "https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31",
-        "msiAccessRoleId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+        "msiAccessRoleId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
         "resourceName": "[toLower(take(concat(variables('functionName'),uniqueString(resourceGroup().id)),24))]",
         "storageAccountName": "[variables('resourceName')]",
         "storageName": "[concat(parameters('storageAccountPrefix'), uniqueString(parameters('storageAccountPrefix'))]"

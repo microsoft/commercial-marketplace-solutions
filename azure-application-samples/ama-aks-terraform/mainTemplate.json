@@ -33,7 +33,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
-      "name": "pid-5bd1b89d-241b-4d1d-bdae-53b24dc58043-partnercenter",
+      "name": "pid-GUID-partnercenter",
 
       "properties": {
         "mode": "Incremental",

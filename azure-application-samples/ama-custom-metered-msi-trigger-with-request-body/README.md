@@ -29,15 +29,9 @@ The Azure function will expect body as follows.
 ARM template expects the following configuration.
 
 1. **Variable artifacts** - ARM template will deploy function from a Zip file. This variable is used to reference to the location of the zip file
-2. ARM using resource type `Microsoft.Resources/deployments`.
+1. ARM using resource type `Microsoft.Resources/deployments`.
 
-  ![diagram](./images/Diagram2.png)
-
-3. In order to pass the Partner Center validation you need to update the resource name with the Customer PID Guid from PartnerCenter.
-
-  ![diagram](./images/Diagram3.png)
-
-4. ARM Template will deploy function using `WEBSITE_RUN_FROM_PACKAGE` and expecting `functionpackage.zip` to place under `artifacts` folder.
+1. ARM Template will deploy function using `WEBSITE_RUN_FROM_PACKAGE` and expecting `functionpackage.zip` to place under `artifacts` folder.
 
   ![diagram](./images/Diagram4.png)
 

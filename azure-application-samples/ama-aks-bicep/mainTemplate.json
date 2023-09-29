@@ -1,0 +1,199 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+        "type": "string"
+        },
+       "storageAccountPrefix": {
+        "type": "string"
+        },
+        "storageAccountType": {
+        "type": "string"
+        }
+     
+    },
+    "variables": {
+      "filesLocation":"[uri(deployment().properties.templateLink.uri, 'artifacts/mainbicep.zip')]",
+      "deployscript":"[uri(deployment().properties.templateLink.uri, 'deploy.sh')]",
+      "tenant": "Publisher Tenant for Key Vault",
+      "vaultSubscription": "Publisher subscription for KeyVault",
+      "vaultResourceGroupName": "Publisher resource group for key Vault",
+      "vaultName": "KeyValut Name",
+      "aadappIdName": "Key Vault secret name for AAD Client ID",
+      "aadappsecretName": "Key Vault secret name for AAD Client Secret",
+      "azureSubscription" :  "[subscription().subscriptionId]"
+
+    },
+    "resources": [
+
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "pid-GUID-partnercenter",
+
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "client_id": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "client_secret": {
+              "type": "securestring",
+                "defaultValue": ""
+            },
+            "tenant": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "mg_resource_group": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "storageType": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "location": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "storageName": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "filesLocation": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "deployscript": {
+              "type": "string",
+                "defaultValue": ""
+            },
+            "deploymentScripts_Deployment_name":
+            {
+                "type": "string",
+                "defaultValue": "[newGuid()]"
+            },
+            "subscription": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "resources": [
+           {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('deploymentScripts_Deployment_name')]",
+            "location": "[parameters('location')]",
+
+            "kind": "AzureCLI",
+            "properties": {
+               "azCliVersion": "2.32.0",
+               "scriptContent": "chmod +x ./deploy.sh; ./deploy.sh",
+               "retentionInterval": "PT4H",
+               "timeout": "PT2H",
+               "containerSettings": {},
+                   "environmentVariables": [
+                    {
+                        "name": "ARM_CLIENT_ID",
+                        "value": "[parameters('client_id')]"
+                    },
+                    {
+                        "name": "ARM_CLIENT_SECRET",
+                        "value": "[parameters('client_secret')]"
+                    },
+                    {
+                        "name": "ARM_TENANT_ID",
+                        "value": "[parameters('tenant')]"
+                    },
+                    {
+                        "name": "STORAGE_TYPE",
+                        "value": "[parameters('storageType')]"
+                    },
+                    {
+                        "name": "LOCATION",
+                        "value": "[parameters('location')]"
+                    },
+                    {
+                        "name": "STORAGE_NAME",
+                        "Value": "[parameters('storageName')]"
+                    },
+                    {
+                    "name": "MG_RESOURCE_GROUP_NAME",
+                        "value": "[parameters('mg_resource_group')]"
+                    },
+                    {
+                      "name":"ARM_SUBSCRIPTION",
+                      "value": "[parameters('subscription')]"
+
+                    }
+                    ],
+               "supportingScriptUris":[
+                    "[parameters('filesLocation')]",
+                    "[parameters('deployscript')]"
+                    ]
+
+            }
+        }
+
+          ],
+          "outputs": {
+          
+          }
+        },
+        "parameters": {
+            "tenant": {
+              "value": "[variables('tenant')]"
+            },
+            "mg_resource_group": {
+                "value": "[resourceGroup().name]"
+            },
+            "storageType": {
+             "value": "[parameters('storageAccountType')]"
+            },
+            "storageName": {
+                "value": "[parameters('storageAccountPrefix')]"
+            },
+            "filesLocation": {
+              "value": "[variables('filesLocation')]"
+            },
+            "deployscript": {
+             "value": "[variables('deployscript')]"
+            },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "subscription": {
+              "value":"[variables('azureSubscription')]"
+            },
+          "client_secret": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(variables('vaultSubscription'), variables('vaultResourceGroupName'), 'Microsoft.KeyVault/vaults', variables('vaultName'))]"
+              },
+              "secretName": "[variables('aadappsecretName')]"
+          }
+          },
+          
+          "client_id": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(variables('vaultSubscription'), variables('vaultResourceGroupName'), 'Microsoft.KeyVault/vaults', variables('vaultName'))]"
+              },
+              "secretName": "[variables('aadappIdName')]"
+            }
+          }
+
+        }
+      }
+    }
+    ]
+}

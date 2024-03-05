@@ -36,13 +36,6 @@
         "description": "Extension Name"
       }
     },
-    "extensionTitle": {
-      "type": "string",
-      "defaultValue": "string",
-      "metadata": {
-        "description": "Extension Title"
-      }
-    },
     "extensionVoteValue1": {
       "type": "string",
       "defaultValue": "string",
@@ -80,15 +73,14 @@
     "plan-name-3": "REPLACE-WITH-YOUR-PLAN-ID",
     "plan-publisher": "REPLACE-WITH-YOUR-PUBLISHER-ID",
     "plan-offerID": "REPLACE-WITH-YOUR-OFFER-ID",
-    "releaseTrain": "REPLACE-WITH-YOUR-RELEASE-TRAIN",
-    "clusterExtensionTypeName": "REPLACE-WITH-YOUR-EXTENSION-TYPE-NAME",
+    "releaseTrain": "stable", // Stable`
+    "clusterExtensionTypeName-plan-1": "REPLACE-WITH-YOUR-EXTENSION-TYPE-NAME For Plan 1",
+    "clusterExtensionTypeName-plan-2": "REPLACE-WITH-YOUR-EXTENSION-TYPE-NAME For Plan 2",
+    "clusterExtensionTypeName-plan-3": "REPLACE-WITH-YOUR-EXTENSION-TYPE-NAME For Plan 3",
+    // Just Demo for naming multi K8s extensions 
     "infra-rc-1": "[concat(parameters('extensionName'),'-',variables('plan-name-1'))]",// OR ENTER YOUR OWN EXTENSION RESOURCE NAME
     "infra-rc-2": "[concat(parameters('extensionName'),'-',variables('plan-name-2'))]",// OR ENTER YOUR OWN EXTENSION RESOURCE NAME
-    "infra-rc-3": "[concat(parameters('extensionName'),'-',variables('plan-name-3'))]",// OR ENTER YOUR OWN EXTENSION RESOURCE NAME
-    "title-rc-1": "[concat(parameters('extensionTitle'),'-',variables('plan-name-1'))]",// OR ENTER YOUR OWN EXTENSION TITLE
-    "title-rc-2": "[concat(parameters('extensionTitle'),'-',variables('plan-name-2'))]",// OR ENTER YOUR OWN EXTENSION TITLE
-    "title-rc-3": "[concat(parameters('extensionTitle'),'-',variables('plan-name-3'))]"// OR ENTER YOUR OWN EXTENSION TITLE
-
+    "infra-rc-3": "[concat(parameters('extensionName'),'-',variables('plan-name-3'))]"// OR ENTER YOUR OWN EXTENSION RESOURCE NAME
 
   },
   "resources": [
@@ -348,7 +340,6 @@
             "apiVersion": "2022-11-01",
             "dependsOn": [
                 "[variables('identityName')]",
-                "[parameters('aksName')]",
                 "get-aks-mi",
                 "[concat('ra-',guid(resourceGroup().id))]",
                 "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]"
@@ -363,13 +354,12 @@
                 "autoUpgradeMinorVersion": true,
                 "configurationProtectedSettings": {},
                 "configurationSettings": {
-                    "title": "[variables('title-rc-1')]"
                     // YOu can add more settings here related to your extension to pass to the helm chart for this plan
                     // value1: "",
                     // value2: ""
                     
                 },
-                "extensionType": "[variables('clusterExtensionTypeName')]",
+                "extensionType": "[variables('clusterExtensionTypeName-plan-1')]",
                 "releaseTrain": "[variables('releaseTrain')]"
             },
             "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
@@ -378,11 +368,6 @@
               {
             "apiVersion": "2022-11-01",
             "dependsOn": [
-                "[variables('identityName')]",
-                "[parameters('aksName')]",
-                "get-aks-mi",
-                "[concat('ra-',guid(resourceGroup().id))]",
-                "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
                  "[variables('infra-rc-1')]"
             ],
             "name": "[variables('infra-rc-2')]",
@@ -395,13 +380,12 @@
                 "autoUpgradeMinorVersion": true,
                 "configurationProtectedSettings": {},
                 "configurationSettings": {
-                    "title": "[variables('title-rc-2')]"
                     // YOu can add more settings here related to your extension to pass to the helm chart for this plan
                     // value1: "",
                     // value2: ""
 
                 },
-                "extensionType": "[variables('clusterExtensionTypeName')]",
+                "extensionType": "[variables('clusterExtensionTypeName-plan-2')]",
                 "releaseTrain": "[variables('releaseTrain')]"
             },
             "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
@@ -410,11 +394,6 @@
     {
             "apiVersion": "2022-11-01",
             "dependsOn": [
-                "[variables('identityName')]",
-                "[parameters('aksName')]",
-                "get-aks-mi",
-                "[concat('ra-',guid(resourceGroup().id))]",
-                "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",
                 "[variables('infra-rc-1')]",
                 "[variables('infra-rc-2')]"
             ],
@@ -428,7 +407,6 @@
                 "autoUpgradeMinorVersion": true,
                 "configurationProtectedSettings": {},
                 "configurationSettings": {
-                    "title": "[variables('title-rc-1')]",
                     // You can add more settings here related to your extension to pass to the helm chart for this plan
                     // value1: "",
                     // value2: ""
@@ -436,7 +414,7 @@
                     "value1": "[parameters('extensionVoteValue1')]",
                     "value2": "[parameters('extensionVoteValue2')]"
                 },
-                "extensionType": "[variables('clusterExtensionTypeName')]",
+                "extensionType": "[variables('clusterExtensionTypeName-plan-3')]",
                 "releaseTrain": "[variables('releaseTrain')]"
             },
             "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('aksName'))]",

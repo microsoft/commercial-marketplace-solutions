@@ -1,0 +1,19 @@
+applicationName: << Enter Name Of Application >> #com.nonmicrosoft.azuretodoapptest
+publisher:  << Enter Name Of Publisher >> #"Contoso Test Publisher"
+description: << Enter description >> #"A test package for the marketplace CNAB structure with existing cluster only."
+version: 1.0.0 #Must be semver
+restrictions:
+  minCores: 4
+  minNodes: 1
+  minKubernetesVersion: 1.21
+  requireGpuNodes: False
+  openShiftAllowed: True
+  nodeType: Linux
+  newClusterRequired: False
+helmChart: <<Enter Helm Location>> #"./AzureToDo"
+clusterArmTemplate: "./mainTemplate.json"
+uiDefinition: "./createUIDefinition.json"
+registryServer: "<< Enter the ACR name >>"
+extensionRegistrationParameters:
+  defaultScope: "cluster"
+  namespace: "<< enter namespace >>"

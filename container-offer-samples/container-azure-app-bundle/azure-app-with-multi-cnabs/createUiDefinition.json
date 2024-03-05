@@ -177,7 +177,7 @@
       "nodeSize": "[basics('nodeSize')]",
       "nodeCount": "[basics('nodeCount')]",
       "managedIdentity": "[steps('managedIdentitySettings').appManagedIdentity]",
-      "extensionName":"[steps('ExtensionConfiguration').Name]",
+      "extensionName":"[steps('ExtensionConfiguration').extensionResourceName]",
       "extensionTitle":"[steps('ExtensionConfiguration').title]",
       "extensionVoteValue1": "[steps('ExtensionConfiguration').value1]",
       "extensionVoteValue2": "[steps('ExtensionConfiguration').value2]"

@@ -1,0 +1,142 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterResoureId": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "extensionResourceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the extension."
+            }
+        },
+        "cognitiveEndPoint": {
+            "type": "string",
+            "metadata": {
+                "description": "cognitiveEndPoint"
+            }
+        },
+        "cognitiveKey": {
+            "type": "string",
+            "metadata": {
+                "description": "cognitiveKey"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "location"
+            }
+        },
+        "storageAccountPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Assign a prefix for the Storage account"
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "metadata": {
+                "description": "Assign Storage account type"
+            }
+        }
+
+
+    },
+    "variables": {
+       "storageName": "[concat(parameters('storageAccountPrefix'), uniqueString(resourceGroup().id))]",
+       "deploymentName":"[concat('nestedTemplate', uniqueString(resourceGroup().id))]",
+       "aksResourceGroup": "[split(parameters('clusterResoureId'), '/')[4]]",
+        "clusterExtensionTypeName": "testtestindustryexperiencestest.azurecomps",
+        "plan-name": "publicplanforprivatepo",
+        "plan-offerID": "msalemcontainerdemo1",
+        "plan-publisher": "testtestindustryexperiencestest",
+        "releaseTrain": "preview"
+    },
+    "resources": [
+            {
+      "comments": "*** Azure Marketplace required usage attribution tracking GUID ***",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "pid-5bd1b89d-241b-4d1d-bdae-53b24dc58043-partnercenter",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+          ]
+        }
+      }
+    },
+      {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageName')]",
+            "apiVersion": "2022-09-01",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            },
+            "kind": "Storage",
+            "properties": {
+                "allowBlobPublicAccess": true
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "[variables('deploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('aksResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.KubernetesConfiguration/extensions",
+                            "apiVersion": "2022-11-01",
+                            "name": "[parameters('extensionResourceName')]",
+                            "properties": {
+                                "extensionType": "[variables('clusterExtensionTypeName')]",
+                                "autoUpgradeMinorVersion": true,
+                                "releaseTrain": "[variables('releaseTrain')]",
+                                "configurationSettings": {
+                                    "cognitive_EndPoint": "[parameters('cognitiveEndPoint')]",
+                                    "cognitive_Key": "[parameters('cognitiveKey')]"
+
+                                }
+
+                            },
+                            "plan": {
+                                "name": "[variables('plan-name')]",
+                                "publisher": "[variables('plan-publisher')]",
+                                "product": "[variables('plan-offerID')]"
+                            },
+                            "scope": "[parameters('clusterResoureId')]"
+                        }
+                    ]
+                },
+                "parameters": {}
+            }
+        }
+
+
+
+
+
+
+    ],
+    "outputs": {
+        "location": {
+        "type": "string",
+        "value": "[parameters('location')]"
+      }
+    }
+}

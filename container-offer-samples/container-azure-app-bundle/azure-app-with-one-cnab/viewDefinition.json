@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/viewdefinition/0.0.1-preview/ViewDefinition.json#",
+    "contentVersion": "0.0.0.1",
+    "views": [
+        {
+            "kind": "Overview",
+            "properties": {
+                "header": "Azure Managed Application with AKS",
+                "description": "This managed application is for **demo** purposes only."
+            }
+        }
+    ]
+}

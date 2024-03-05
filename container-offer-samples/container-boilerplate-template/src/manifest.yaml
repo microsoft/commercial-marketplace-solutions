@@ -10,7 +10,7 @@ restrictions:
   openShiftAllowed: True
   nodeType: Linux
   newClusterRequired: False
-helmChart: <<Enter Helm Location>> #"./AzureToDo"
+helmChart: <<Enter Helm Location>> #"example ./AzureToDo"
 clusterArmTemplate: "./mainTemplate.json"
 uiDefinition: "./createUIDefinition.json"
 registryServer: "<< Enter the ACR name >>"

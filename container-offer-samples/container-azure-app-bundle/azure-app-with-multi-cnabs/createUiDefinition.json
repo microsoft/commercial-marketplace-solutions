@@ -132,18 +132,7 @@
             },
             "visible": true
           },
-          {
-            "name": "title",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Extension Resource Title",
-            "defaultValue": "Azure Vote App",
-            "toolTip": "title",
-            "constraints": {
-              "required": true,
-              "regex": "^[a-z0-9A-Z]{6,30}$",
-              "validationMessage": "Only alphanumeric characters are allowed, and the value must be 6-30 characters long."
-            }
-          },
+         // This is demo for HOW-TO add values to pass to HELM chart
           {
             "name": "value1",
             "type": "Microsoft.Common.TextBox",
@@ -178,7 +167,6 @@
       "nodeCount": "[basics('nodeCount')]",
       "managedIdentity": "[steps('managedIdentitySettings').appManagedIdentity]",
       "extensionName":"[steps('ExtensionConfiguration').extensionResourceName]",
-      "extensionTitle":"[steps('ExtensionConfiguration').title]",
       "extensionVoteValue1": "[steps('ExtensionConfiguration').value1]",
       "extensionVoteValue2": "[steps('ExtensionConfiguration').value2]"
 
